@@ -251,4 +251,53 @@ export default function CityDesigner() {
             <SingleSelect items={climates} selected={city.climate} onSelect={set("climate")} />
             <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "20px 0 10px" }}>Tageszeit</p>
             <SingleSelect items={daytimes} selected={city.daytime} onSelect={set("daytime")} />
-            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "
+            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "20px 0 10px" }}>Stimmung</p>
+            <SingleSelect items={moods} selected={city.mood} onSelect={set("mood")} />
+            <NavButtons onBack={back} onNext={next} canNext={!!city.climate && !!city.mood} />
+          </Card>
+        )}
+        {step === 4 && (
+          <Card>
+            <SectionTitle icon="👥" title="Bevölkerung" sub="Wer wohnt in deiner Stadt?" />
+            <SliderField label="Wohlstand" value={city.wealth} onChange={set("wealth")} leftLabel="Arbeiterklasse" rightLabel="Wohlhabend" />
+            <SliderField label="Diversität" value={city.diversity} onChange={set("diversity")} leftLabel="Homogen" rightLabel="Kosmopolit" />
+            <SliderField label="Altersstruktur" value={city.ageProfile} onChange={set("ageProfile")} leftLabel="Jung & dynamisch" rightLabel="Erfahren & reif" />
+            <NavButtons onBack={back} onNext={next} />
+          </Card>
+        )}
+        {step === 5 && (
+          <Card>
+            <SectionTitle icon="📋" title={`"${city.name}" – Zusammenfassung`} sub="Überprüfe alles und starte dann die Generierung." />
+            <div style={{ background: "#f9fafb", borderRadius: 14, padding: 20, marginBottom: 8 }}>
+              {summaryRow("Stadtname", city.name)}
+              {summaryRow("Bebauungsdichte", `${city.density}%`)}
+              {summaryRow("Modernität", `${city.modernity}%`)}
+              {summaryRow("Grünanteil", `${city.greenery}%`)}
+              {summaryRow("Architekturstil", architectureStyles.find(s => s.id === city.archStyle)?.label || "—")}
+              {summaryRow("Klima", climates.find(s => s.id === city.climate)?.label || "—")}
+              {summaryRow("Tageszeit", daytimes.find(s => s.id === city.daytime)?.label || "—")}
+              {summaryRow("Stimmung", moods.find(s => s.id === city.mood)?.label || "—")}
+              {summaryRow("Wohlstand", `${city.wealth}%`)}
+              {summaryRow("Diversität", `${city.diversity}%`)}
+              {summaryRow("Altersstruktur", `${city.ageProfile}%`)}
+            </div>
+            <NavButtons onBack={back} onNext={startGeneration} nextLabel="🏙️ Stadt erstellen →" />
+          </Card>
+        )}
+        {step === 6 && prompts && (
+          <div>
+            <div style={{ textAlign: "center", marginBottom: 24 }}>
+              <div style={{ fontSize: 40, marginBottom: 6 }}>🎉</div>
+              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#1f2937" }}>{city.name} – Deine Stadtbilder</h2>
+              <p style={{ color: "#6b7280", fontSize: 13, margin: "6px 0 0" }}>Generiere jedes Bild einzeln per Klick — eines nach dem anderen für beste Qualität.</p>
+            </div>
+            <ImageCard label="1. Innenstadt-Ansicht" emoji="🏙️" colorBorder="#6366f1" prompt={prompts.street} url={urls.street} genLabel="🏙️ Innenstadt generieren" onGenerate={() => genImage('street', 896, 512)} />
+            <ImageCard label="2. Luftbild / Vogelperspektive" emoji="🛩️" colorBorder="#10b981" prompt={prompts.aerial} url={urls.aerial} genLabel="🛩️ Luftbild generieren" onGenerate={() => genImage('aerial', 896, 512)} />
+            <ImageCard label="3. Typischer Bewohner" emoji="👤" colorBorder="#f59e0b" prompt={prompts.resident} url={urls.resident} genLabel="👤 Bewohner generieren" onGenerate={() => genImage('resident', 512, 768)} />
+            <button onClick={reset} style={{ width: "100%", marginTop: 8, padding: "14px", borderRadius: 14, border: "2px solid #e5e7eb", background: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14, color: "#374151" }}>🔄 Neue Stadt entwerfen</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
