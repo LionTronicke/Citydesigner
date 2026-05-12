@@ -58,18 +58,14 @@ const makeUrl = (prompt, w, h) => {
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true&model=flux&seed=${seed}`;
 };
 
-// Einzelne Bildkarte mit manuellem Trigger
 const ImageCard = ({ label, emoji, colorBorder, prompt, url, onGenerate, genLabel }) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
-
-  // Reset wenn neue URL kommt
   const [prevUrl, setPrevUrl] = useState(null);
   if (url !== prevUrl) { setPrevUrl(url); setLoaded(false); setError(false); }
 
   return (
     <div style={{ borderRadius: 20, border: `2px solid ${colorBorder}`, overflow: "hidden", marginBottom: 20, background: "#0f172a" }}>
-      {/* Header */}
       <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `2px solid ${colorBorder}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 22 }}>{emoji}</span>
@@ -79,29 +75,19 @@ const ImageCard = ({ label, emoji, colorBorder, prompt, url, onGenerate, genLabe
           <button onClick={onGenerate} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, border: `1px solid ${colorBorder}`, background: "transparent", color: colorBorder, cursor: "pointer" }}>🔁 Neu</button>
         )}
       </div>
-
-      {/* Body */}
       <div style={{ minHeight: 200, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-        {/* Noch nicht gestartet */}
         {!url && (
           <div style={{ padding: 32, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
             <span style={{ fontSize: 40 }}>🎨</span>
-            <button
-              onClick={onGenerate}
-              style={{ padding: "13px 28px", borderRadius: 14, border: "none", background: colorBorder, color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer" }}
-            >{genLabel}</button>
+            <button onClick={onGenerate} style={{ padding: "13px 28px", borderRadius: 14, border: "none", background: colorBorder, color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer" }}>{genLabel}</button>
           </div>
         )}
-
-        {/* Lädt */}
         {url && !loaded && !error && (
           <div style={{ padding: 32, display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
             <div style={{ width: 42, height: 42, border: `3px solid ${colorBorder}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.9s linear infinite" }} />
             <span style={{ color: "#94a3b8", fontSize: 13 }}>KI generiert Bild… (kann 20–40 Sek. dauern)</span>
           </div>
         )}
-
-        {/* Fehler */}
         {error && (
           <div style={{ padding: 32, textAlign: "center" }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
@@ -109,19 +95,10 @@ const ImageCard = ({ label, emoji, colorBorder, prompt, url, onGenerate, genLabe
             <button onClick={onGenerate} style={{ padding: "9px 22px", borderRadius: 10, border: "none", background: colorBorder, color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>Nochmals versuchen</button>
           </div>
         )}
-
-        {/* Bild */}
         {url && (
-          <img
-            src={url} alt={label}
-            onLoad={() => setLoaded(true)}
-            onError={() => { setError(true); setLoaded(false); }}
-            style={{ width: "100%", display: loaded ? "block" : "none" }}
-          />
+          <img src={url} alt={label} onLoad={() => setLoaded(true)} onError={() => { setError(true); setLoaded(false); }} style={{ width: "100%", display: loaded ? "block" : "none" }} />
         )}
       </div>
-
-      {/* Prompt */}
       <details style={{ padding: "6px 16px 10px", borderTop: "1px solid #1e293b" }}>
         <summary style={{ fontSize: 11, color: "#4b5563", cursor: "pointer", userSelect: "none" }}>Prompt anzeigen</summary>
         <div style={{ fontFamily: "monospace", fontSize: 11, color: "#6b7280", lineHeight: 1.7, marginTop: 6, wordBreak: "break-word" }}>{prompt}</div>
@@ -172,8 +149,8 @@ const ProgressBar = ({ step }) => (
   </div>
 );
 
-const Card = ({ children, extraStyle }) => (
-  <div style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 4px 32px rgba(0,0,0,0.08)", ...extraStyle }}>
+const Card = ({ children }) => (
+  <div style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 4px 32px rgba(0,0,0,0.08)" }}>
     {children}
   </div>
 );
@@ -233,21 +210,17 @@ export default function CityDesigner() {
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "32px 16px", fontFamily: "system-ui, sans-serif" }}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } * { box-sizing: border-box; }`}</style>
       <div style={{ width: "100%", maxWidth: 640 }}>
-
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ fontSize: 48, marginBottom: 4 }}>🏙️</div>
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: "#1f2937", letterSpacing: -0.5 }}>CityDesigner</h1>
           <p style={{ margin: "6px 0 0", color: "#6b7280", fontSize: 14 }}>Erschaffe deine Traumstadt – Schritt für Schritt</p>
         </div>
-
         <ProgressBar step={step} />
 
-        {/* SCHRITT 0 */}
         {step === 0 && (
           <Card>
-            <SectionTitle icon="✨" title="Willkommen!" sub="Gib deiner Stadt zuerst einen Namen. Dann gestalten wir gemeinsam alles andere." />
-            <input value={city.name} onChange={e => setCity(c => ({ ...c, name: e.target.value }))}
-              placeholder="z.B. Nova Lumina, Eisenhafen, ..."
+            <SectionTitle icon="✨" title="Willkommen!" sub="Gib deiner Stadt zuerst einen Namen." />
+            <input value={city.name} onChange={e => setCity(c => ({ ...c, name: e.target.value }))} placeholder="z.B. Nova Lumina, Eisenhafen, ..."
               style={{ width: "100%", padding: "16px 18px", borderRadius: 14, border: "2px solid #4f46e5", fontSize: 18, fontWeight: 700, color: "#ffffff", background: "#1e1b4b", outline: "none", marginBottom: 8 }} />
             <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>Der Name prägt die gesamte Persönlichkeit deiner Stadt.</p>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 28 }}>
@@ -255,8 +228,6 @@ export default function CityDesigner() {
             </div>
           </Card>
         )}
-
-        {/* SCHRITT 1 */}
         {step === 1 && (
           <Card>
             <SectionTitle icon="🎚️" title="Stadtcharakter" sub="Wie fühlt sich deine Stadt an?" />
@@ -266,8 +237,6 @@ export default function CityDesigner() {
             <NavButtons onBack={back} onNext={next} />
           </Card>
         )}
-
-        {/* SCHRITT 2 */}
         {step === 2 && (
           <Card>
             <SectionTitle icon="🏗️" title="Architekturstil" sub="Welcher Stil prägt das Erscheinungsbild?" />
@@ -275,8 +244,6 @@ export default function CityDesigner() {
             <NavButtons onBack={back} onNext={next} canNext={!!city.archStyle} />
           </Card>
         )}
-
-        {/* SCHRITT 3 */}
         {step === 3 && (
           <Card>
             <SectionTitle icon="🌤️" title="Atmosphäre" sub="Klima, Tageszeit und Stimmung deiner Stadt." />
@@ -284,76 +251,4 @@ export default function CityDesigner() {
             <SingleSelect items={climates} selected={city.climate} onSelect={set("climate")} />
             <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "20px 0 10px" }}>Tageszeit</p>
             <SingleSelect items={daytimes} selected={city.daytime} onSelect={set("daytime")} />
-            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "20px 0 10px" }}>Stimmung</p>
-            <SingleSelect items={moods} selected={city.mood} onSelect={set("mood")} />
-            <NavButtons onBack={back} onNext={next} canNext={!!city.climate && !!city.mood} />
-          </Card>
-        )}
-
-        {/* SCHRITT 4 */}
-        {step === 4 && (
-          <Card>
-            <SectionTitle icon="👥" title="Bevölkerung" sub="Wer wohnt in deiner Stadt?" />
-            <SliderField label="Wohlstand" value={city.wealth} onChange={set("wealth")} leftLabel="Arbeiterklasse" rightLabel="Wohlhabend" />
-            <SliderField label="Diversität" value={city.diversity} onChange={set("diversity")} leftLabel="Homogen" rightLabel="Kosmopolit" />
-            <SliderField label="Altersstruktur" value={city.ageProfile} onChange={set("ageProfile")} leftLabel="Jung & dynamisch" rightLabel="Erfahren & reif" />
-            <NavButtons onBack={back} onNext={next} />
-          </Card>
-        )}
-
-        {/* SCHRITT 5 */}
-        {step === 5 && (
-          <Card>
-            <SectionTitle icon="📋" title={`"${city.name}" – Zusammenfassung`} sub="Überprüfe alles und starte dann die Generierung." />
-            <div style={{ background: "#f9fafb", borderRadius: 14, padding: 20, marginBottom: 8 }}>
-              {summaryRow("Stadtname", city.name)}
-              {summaryRow("Bebauungsdichte", `${city.density}%`)}
-              {summaryRow("Modernität", `${city.modernity}%`)}
-              {summaryRow("Grünanteil", `${city.greenery}%`)}
-              {summaryRow("Architekturstil", architectureStyles.find(s => s.id === city.archStyle)?.label || "—")}
-              {summaryRow("Klima", climates.find(s => s.id === city.climate)?.label || "—")}
-              {summaryRow("Tageszeit", daytimes.find(s => s.id === city.daytime)?.label || "—")}
-              {summaryRow("Stimmung", moods.find(s => s.id === city.mood)?.label || "—")}
-              {summaryRow("Wohlstand", `${city.wealth}%`)}
-              {summaryRow("Diversität", `${city.diversity}%`)}
-              {summaryRow("Altersstruktur", `${city.ageProfile}%`)}
-            </div>
-            <NavButtons onBack={back} onNext={startGeneration} nextLabel="🏙️ Stadt erstellen →" />
-          </Card>
-        )}
-
-        {/* SCHRITT 6 – Ergebnisse */}
-        {step === 6 && prompts && (
-          <div>
-            <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <div style={{ fontSize: 40, marginBottom: 6 }}>🎉</div>
-              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#1f2937" }}>{city.name} – Deine Stadtbilder</h2>
-              <p style={{ color: "#6b7280", fontSize: 13, margin: "6px 0 0" }}>Generiere jedes Bild einzeln per Klick — eines nach dem anderen für beste Qualität.</p>
-            </div>
-
-            <ImageCard
-              label="1. Innenstadt-Ansicht" emoji="🏙️"
-              colorBorder="#6366f1" prompt={prompts.street} url={urls.street}
-              genLabel="🏙️ Innenstadt generieren"
-              onGenerate={() => genImage('street', 896, 512)}
-            />
-            <ImageCard
-              label="2. Luftbild / Vogelperspektive" emoji="🛩️"
-              colorBorder="#10b981" prompt={prompts.aerial} url={urls.aerial}
-              genLabel="🛩️ Luftbild generieren"
-              onGenerate={() => genImage('aerial', 896, 512)}
-            />
-            <ImageCard
-              label="3. Typischer Bewohner" emoji="👤"
-              colorBorder="#f59e0b" prompt={prompts.resident} url={urls.resident}
-              genLabel="👤 Bewohner generieren"
-              onGenerate={() => genImage('resident', 512, 768)}
-            />
-
-            <button onClick={reset} style={{ width: "100%", marginTop: 8, padding: "14px", borderRadius: 14, border: "2px solid #e5e7eb", background: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14, color: "#374151" }}>🔄 Neue Stadt entwerfen</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "
