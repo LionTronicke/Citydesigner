@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -20,19 +20,14 @@ export default async function handler(req, res) {
     );
 
     const data = await response.json();
-
     if (data.error) return res.status(500).json({ error: data.error.message });
 
-    // Bild ist in den Parts als inlineData enthalten
     const parts = data.candidates?.[0]?.content?.parts || [];
     const imagePart = parts.find(p => p.inlineData?.mimeType?.startsWith("image/"));
 
     if (!imagePart) return res.status(500).json({ error: "Kein Bild erhalten – versuche es erneut" });
 
-    const base64 = imagePart.inlineData.data;
-    const mime = imagePart.inlineData.mimeType;
-
-    res.status(200).json({ image: `data:${mime};base64,${base64}` });
+    res.status(200).json({ image: `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}` });
 
   } catch (err) {
     res.status(500).json({ error: "Serverfehler: " + err.message });
