@@ -46,64 +46,68 @@ const STEPS = [
 ];
 
 /* ============================================================
-   PROMPT-BUILDER  (EIN kombinierter 3-Panel-Prompt)
+   PROMPT-BUILDER – 3 separate Prompts
    ============================================================ */
-function buildCombinedPrompt(city) {
+function buildPrompts(city) {
   const styleMap = {
-    european: "European classical architecture",
-    asian: "Asian architecture with pagodas",
-    futuristic: "futuristic sci-fi architecture with glass and steel",
-    american: "American urban skyline",
-    mediterranean: "Mediterranean white-washed buildings",
-    nordic: "Nordic minimalist wooden architecture",
+    european: "European classical architecture with ornate facades, cobblestone streets, baroque and neoclassical buildings",
+    asian: "Asian architecture with traditional pagodas, red lanterns, dense street markets, and ornamental gates",
+    futuristic: "futuristic sci-fi architecture with glass skyscrapers, neon lights, floating structures, and advanced technology",
+    american: "American urban architecture with glass and steel skyscrapers, wide boulevards, and suburban sprawl",
+    mediterranean: "Mediterranean architecture with white-washed cubic buildings, terracotta roofs, narrow alleyways, and bougainvillea",
+    nordic: "Nordic minimalist wooden architecture with clean lines, pitched roofs, natural materials, and Scandinavian design",
   };
   const climateMap = {
-    tropical: "tropical lush vegetation", desert: "arid desert landscape",
-    temperate: "temperate green surroundings", arctic: "snowy arctic environment",
-    rainy: "rainy misty atmosphere",
+    tropical: "lush tropical vegetation, palm trees, humid atmosphere, vibrant colors",
+    desert: "arid desert landscape, sandstone, warm golden tones, sparse vegetation",
+    temperate: "temperate green surroundings, deciduous trees, mild light",
+    arctic: "snowy arctic environment, frost, cold blue tones, evergreen trees",
+    rainy: "rainy misty atmosphere, wet streets, reflections, grey sky",
   };
   const timeMap = {
-    dawn: "at dawn with soft pink light", day: "in bright daylight",
-    golden: "in golden hour warm light", night: "at night with glowing city lights",
-    storm: "during a dramatic storm",
+    dawn: "at dawn with soft pink and orange light, early morning mist",
+    day: "in bright daylight with clear blue sky",
+    golden: "in golden hour with warm amber light and long shadows",
+    night: "at night with glowing city lights, neon signs, illuminated windows",
+    storm: "during a dramatic storm with dark clouds, lightning, rain",
   };
   const moodMap = {
-    vibrant: "vibrant and lively", peaceful: "calm and peaceful",
-    mysterious: "dark and mysterious", industrial: "industrial and gritty",
-    romantic: "romantic and atmospheric",
+    vibrant: "vibrant and lively atmosphere, busy streets, colorful",
+    peaceful: "calm and peaceful, quiet streets, serene",
+    mysterious: "dark and mysterious, moody, atmospheric shadows",
+    industrial: "industrial and gritty, smoke, heavy machinery visible",
+    romantic: "romantic and atmospheric, soft glow, intimate",
   };
-  const style = styleMap[city.archStyle] || "mixed architecture";
-  const climate = climateMap[city.climate] || "temperate climate";
-  const time = timeMap[city.daytime] || "in daylight";
-  const mood = moodMap[city.mood] || "lively";
-  const density = city.density > 66 ? "densely packed urban" : city.density > 33 ? "medium density" : "sparse low-rise";
-  const greenery = city.greenery > 66 ? "with lots of parks and trees" : city.greenery > 33 ? "with some greenery" : "with minimal vegetation";
-  const modern = city.modernity > 66 ? "ultra-modern" : city.modernity > 33 ? "blend of old and new" : "historic and traditional";
+  const style = styleMap || "mixed architecture";
+  const climate = climateMap || "temperate climate";
+  const time = timeMap || "in daylight";
+  const mood = moodMap || "lively";
+  const density = city.density > 66 ? "densely packed urban high-rise" : city.density > 33 ? "medium density mixed-use" : "sparse low-rise suburban";
+  const greenery = city.greenery > 66 ? "abundant parks, tree-lined streets, green roofs, urban gardens" : city.greenery > 33 ? "some parks and street trees" : "minimal vegetation, mostly concrete";
+  const modern = city.modernity > 66 ? "ultra-modern contemporary" : city.modernity > 33 ? "blend of historic and modern" : "historic and traditional";
   const wealth = city.wealth > 66 ? "wealthy and affluent" : city.wealth > 33 ? "middle-class" : "working-class";
-  const age = city.ageProfile > 60 ? "elderly population" : city.ageProfile < 40 ? "young population" : "mixed-age population";
+  const age = city.ageProfile > 60 ? "elderly population, retirement-oriented" : city.ageProfile < 40 ? "young dynamic population, students and professionals" : "mixed-age diverse population";
+  const diversity = city.diversity > 66 ? "highly multicultural and cosmopolitan" : city.diversity > 33 ? "moderately diverse" : "culturally homogeneous";
+  const mobNote = city.mobility.transit > 40 ? "prominent tram lines, metro stations, bus stops" : city.mobility.car > 50 ? "wide roads, parking lots, car-dominated" : "bike lanes, pedestrian zones";
+  const energyNote = city.energy.renewable > 50 ? "solar panels on rooftops, wind turbines visible on the horizon" : city.energy.fossil > 50 ? "industrial chimneys, power plant in the background" : "";
 
-  return (
-    `Three-panel triptych collage of the city ${city.name}, seamless cinematic composition, ` +
-    `LEFT PANEL: photorealistic wide-angle street-level view of ${density} downtown, ${style}, ${modern}, ${greenery}, ${mood}, ${time}; ` +
-    `CENTER PANEL: photorealistic portrait of a typical resident, ${wealth} ${age}, dressed reflecting ${style} culture and ${climate}, candid street photography, natural lighting; ` +
-    `RIGHT PANEL: breathtaking aerial bird's-eye drone view from 500m, ${style}, ${density} layout, ${climate}, ${greenery}, ${time}; ` +
-    `consistent color palette across all three panels, ultra-detailed, 8K, hyperrealistic, cinematic lighting, professional photography`
-  );
+  const base = `photorealistic, ultra-detailed, 8K, cinematic lighting, professional photography, ${style}, ${modern}, ${climate}, ${time}, ${mood}, ${greenery}`;
+
+  return {
+    downtown: `${base}, wide-angle street-level view of ${density} downtown district of the city ${city.name}, ${mobNote}, ${energyNote}, bustling city center with shops and pedestrians, dramatic perspective`,
+    resident: `${base}, candid portrait photograph of a typical resident of ${city.name}, ${wealth} ${age}, ${diversity}, dressed in clothing reflecting the local culture and ${city.climate} climate, standing on a characteristic street of the city, shallow depth of field, natural ambient light, ${time}`,
+    aerial: `${base}, breathtaking aerial bird's-eye drone view from 400 meters altitude over ${city.name}, ${density} urban layout, ${greenery}, ${mobNote}, city infrastructure clearly visible, rivers or parks if present, ${energyNote}, sweeping panoramic cityscape`,
+  };
 }
 
-const makeUrl = (prompt, w, h) => {
-  const seed = Math.floor(Math.random() * 999999);
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true&model=flux&seed=${seed}`;
-};
-
 /* ============================================================
-   PIE-CHART KOMPONENTE (Pure SVG, keine Lib nötig)
+   PIE-CHART KOMPONENTE
    ============================================================ */
-const PieChart = ({ title, data, size = 180 }) => {
+const PieChart = ({ title, data, size = 160 }) => {
   const total = data.reduce((s, d) => s + d.value, 0) || 1;
-  const cx = size / 2, cy = size / 2, r = size / 2 - 4;
+  const cx = size / 2, cy = size / 2, r = size / 2 - 6;
   let acc = 0;
-  const slices = data.map((d, i) => {
+  const slices = data.map((d) => {
     const start = (acc / total) * Math.PI * 2 - Math.PI / 2;
     acc += d.value;
     const end = (acc / total) * Math.PI * 2 - Math.PI / 2;
@@ -111,23 +115,21 @@ const PieChart = ({ title, data, size = 180 }) => {
     const x2 = cx + r * Math.cos(end), y2 = cy + r * Math.sin(end);
     const large = end - start > Math.PI ? 1 : 0;
     const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
-    return { path, color: d.color, label: d.label, value: d.value, pct: Math.round((d.value / total) * 100) };
+    return { path, color: d.color, label: d.label, pct: Math.round((d.value / total) * 100) };
   });
   return (
-    <div style={{ background: "#fff", borderRadius: 16, padding: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
-      <h4 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 800, color: "#1f2937", textAlign: "center" }}>{title}</h4>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+    <div style={{ background: "#fff", borderRadius: 16, padding: "20px 18px", boxShadow: "0 2px 16px rgba(0,0,0,0.07)", border: "1px solid #f1f5f9" }}>
+      <h4 style={{ margin: "0 0 14px", fontSize: 13, fontWeight: 800, color: "#1f2937", textAlign: "center", textTransform: "uppercase", letterSpacing: 0.5 }}>{title}</h4>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          {slices.map((s, i) => (
-            <path key={i} d={s.path} fill={s.color} stroke="#fff" strokeWidth="2" />
-          ))}
+          {slices.map((s, i) => <path key={i} d={s.path} fill={s.color} stroke="#fff" strokeWidth="2" />)}
         </svg>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 12 }}>
           {slices.map((s, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ width: 12, height: 12, borderRadius: 3, background: s.color, display: "inline-block" }} />
+              <span style={{ width: 10, height: 10, borderRadius: 2, background: s.color, display: "inline-block", flexShrink: 0 }} />
               <span style={{ color: "#374151", fontWeight: 600 }}>{s.label}</span>
-              <span style={{ color: "#6b7280", marginLeft: "auto" }}>{s.pct}%</span>
+              <span style={{ color: "#6b7280", marginLeft: "auto", fontWeight: 700 }}>{s.pct}%</span>
             </div>
           ))}
         </div>
@@ -137,54 +139,75 @@ const PieChart = ({ title, data, size = 180 }) => {
 };
 
 /* ============================================================
-   GROßES BILD-CARD (3-Panel)
+   EINZELNES BILD-CARD mit eigenem Generier-Button
    ============================================================ */
-const BigImageCard = ({ prompt, url, onGenerate }) => {
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
-  const [prevUrl, setPrevUrl] = useState(null);
-  if (url !== prevUrl) { setPrevUrl(url); setLoaded(false); setError(false); }
+const ImageCard = ({ title, icon, prompt, label }) => {
+  const [imgData, setImgData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const generate = async () => {
+    setLoading(true);
+    setError(null);
+    setImgData(null);
+    try {
+      const res = await fetch("/api/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setImgData(data.image);
+    } catch (e) {
+      setError(e.message || "Generierung fehlgeschlagen");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div style={{ borderRadius: 24, border: "2px solid #6366f1", overflow: "hidden", marginBottom: 24, background: "#0f172a" }}>
-      <div style={{ padding: "16px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "2px solid #6366f1" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 26 }}>🎨</span>
-          <span style={{ fontWeight: 800, fontSize: 16, color: "#f1f5f9" }}>3-Panel Stadtansicht (Innenstadt · Bewohner · Vogelperspektive)</span>
+    <div style={{ borderRadius: 20, border: "2px solid #e5e7eb", overflow: "hidden", background: "#0f172a", display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "2px solid #1e293b" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 22 }}>{icon}</span>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 14, color: "#f1f5f9" }}>{title}</div>
+            <div style={{ fontSize: 11, color: "#64748b" }}>{label}</div>
+          </div>
         </div>
-        {url && loaded && (
-          <button onClick={onGenerate} style={{ fontSize: 12, padding: "6px 14px", borderRadius: 10, border: "1px solid #6366f1", background: "transparent", color: "#a5b4fc", cursor: "pointer", fontWeight: 700 }}>🔁 Neu generieren</button>
+        {imgData && !loading && (
+          <button onClick={generate} style={{ fontSize: 11, padding: "5px 12px", borderRadius: 8, border: "1px solid #334155", background: "transparent", color: "#94a3b8", cursor: "pointer", fontWeight: 700 }}>🔁 Neu</button>
         )}
       </div>
-      <div style={{ minHeight: 360, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-        {!url && (
-          <div style={{ padding: 60, display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
-            <span style={{ fontSize: 64 }}>🏙️</span>
-            <button onClick={onGenerate} style={{ padding: "16px 36px", borderRadius: 16, border: "none", background: "#6366f1", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 4px 20px rgba(99,102,241,0.4)" }}>
-              ✨ Stadtbild generieren
+      <div style={{ minHeight: 260, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", flex: 1 }}>
+        {!imgData && !loading && !error && (
+          <div style={{ padding: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+            <button onClick={generate} style={{ padding: "13px 28px", borderRadius: 14, border: "none", background: "#6366f1", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer", boxShadow: "0 4px 18px rgba(99,102,241,0.4)" }}>
+              ✨ {title} generieren
             </button>
-            <span style={{ color: "#94a3b8", fontSize: 12 }}>Ein einziges großes Bild — schont den Server</span>
           </div>
         )}
-        {url && !loaded && !error && (
-          <div style={{ padding: 60, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-            <div style={{ width: 56, height: 56, border: "4px solid #6366f1", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.9s linear infinite" }} />
-            <span style={{ color: "#94a3b8", fontSize: 14 }}>KI generiert dein Stadtbild… (kann 30–60 Sek. dauern)</span>
+        {loading && (
+          <div style={{ padding: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 48, height: 48, border: "4px solid #6366f1", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.9s linear infinite" }} />
+            <span style={{ color: "#94a3b8", fontSize: 13 }}>KI generiert… (10–30 Sek.)</span>
           </div>
         )}
         {error && (
-          <div style={{ padding: 50, textAlign: "center" }}>
-            <div style={{ fontSize: 42, marginBottom: 10 }}>⚠️</div>
-            <p style={{ color: "#f87171", fontSize: 14, margin: "0 0 14px" }}>Generierung fehlgeschlagen.</p>
-            <button onClick={onGenerate} style={{ padding: "11px 26px", borderRadius: 12, border: "none", background: "#6366f1", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Nochmals versuchen</button>
+          <div style={{ padding: 30, textAlign: "center" }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>⚠️</div>
+            <p style={{ color: "#f87171", fontSize: 13, margin: "0 0 12px", maxWidth: 260 }}>{error}</p>
+            <button onClick={generate} style={{ padding: "9px 20px", borderRadius: 10, border: "none", background: "#6366f1", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>Nochmals versuchen</button>
           </div>
         )}
-        {url && (
-          <img src={url} alt="Stadt-Triptychon" onLoad={() => setLoaded(true)} onError={() => { setError(true); setLoaded(false); }} style={{ width: "100%", display: loaded ? "block" : "none" }} />
+        {imgData && (
+          <img src={imgData} alt={title} style={{ width: "100%", display: "block" }} />
         )}
       </div>
-      <details style={{ padding: "8px 18px 12px", borderTop: "1px solid #1e293b" }}>
-        <summary style={{ fontSize: 11, color: "#64748b", cursor: "pointer", userSelect: "none" }}>Prompt anzeigen</summary>
-        <div style={{ fontFamily: "monospace", fontSize: 11, color: "#94a3b8", lineHeight: 1.7, marginTop: 8, wordBreak: "break-word" }}>{prompt}</div>
+      <details style={{ padding: "6px 14px 10px", borderTop: "1px solid #1e293b" }}>
+        <summary style={{ fontSize: 10, color: "#475569", cursor: "pointer", userSelect: "none" }}>Prompt anzeigen</summary>
+        <div style={{ fontFamily: "monospace", fontSize: 10, color: "#64748b", lineHeight: 1.6, marginTop: 6, wordBreak: "break-word" }}>{prompt}</div>
       </details>
     </div>
   );
@@ -207,22 +230,21 @@ const SliderField = ({ label, value, onChange, leftLabel, rightLabel }) => (
   </div>
 );
 
-/* Mehrere Slider, deren Summe normalisiert auf 100 angezeigt wird */
 const MixSliders = ({ title, values, setValues, fields }) => {
-  const total = fields.reduce((s, f) => s + (values[f.key] || 0), 0) || 1;
+  const total = fields.reduce((s, f) => s + (values || 0), 0) || 1;
   return (
     <div style={{ marginBottom: 16 }}>
       <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", marginBottom: 12 }}>{title}</p>
       {fields.map(f => {
-        const pct = Math.round(((values[f.key] || 0) / total) * 100);
+        const pct = Math.round(((values || 0) / total) * 100);
         return (
           <div key={f.key} style={{ marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
               <span style={{ fontSize: 13, color: "#374151" }}>{f.emoji} {f.label}</span>
               <span style={{ fontSize: 12, fontWeight: 700, color: f.color }}>{pct}%</span>
             </div>
-            <input type="range" min={0} max={100} value={values[f.key] || 0}
-              onChange={e => setValues({ ...values, [f.key]: Number(e.target.value) })}
+            <input type="range" min={0} max={100} value={values || 0}
+              onChange={e => setValues({ ...values, : Number(e.target.value) })}
               style={{ width: "100%", accentColor: f.color }} />
           </div>
         );
@@ -280,6 +302,15 @@ const NavButtons = ({ onBack, onNext, nextLabel = "Weiter →", canNext = true }
   </div>
 );
 
+function Stat({ label, value, emoji }) {
+  return (
+    <div style={{ background: "#f8fafc", borderRadius: 12, padding: "12px 14px", border: "1px solid #e5e7eb" }}>
+      <div style={{ fontSize: 10, color: "#6b7280", textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4, fontWeight: 600 }}>{emoji} {label}</div>
+      <div style={{ fontSize: 15, fontWeight: 800, color: "#1f2937" }}>{value}</div>
+    </div>
+  );
+}
+
 /* ============================================================
    HAUPTKOMPONENTE
    ============================================================ */
@@ -290,19 +321,14 @@ export default function CityDesigner() {
     density: 50, modernity: 50, greenery: 50,
     archStyle: "", climate: "", daytime: "day", mood: "",
     wealth: 50, diversity: 50, ageProfile: 50,
-    // Mobilität
     mobility: { car: 30, bike: 25, transit: 30, foot: 15 },
-    // Energie
     energy: { renewable: 40, fossil: 35, nuclear: 15, other: 10 },
-    // Wirtschaft
     economy: { services: 45, industry: 25, tech: 20, agri: 10 },
-    // Finanzen
     taxModel: "balanced",
     incomeTax: 35, corpTax: 25, vat: 19,
-    debt: 40, // in % vom BIP
+    debt: 40,
   });
-  const [prompt, setPrompt] = useState(null);
-  const [imgUrl, setImgUrl] = useState(null);
+  const [prompts, setPrompts] = useState(null);
 
   const set = (key) => (val) => setCity(c => ({ ...c, [key]: val }));
   const setObj = (key) => (val) => setCity(c => ({ ...c, [key]: val }));
@@ -310,14 +336,8 @@ export default function CityDesigner() {
   const back = () => setStep(s => s - 1);
 
   const startGeneration = () => {
-    const p = buildCombinedPrompt(city);
-    setPrompt(p);
-    setImgUrl(null);
+    setPrompts(buildPrompts(city));
     setStep(STEPS.length - 1);
-  };
-  const generateImage = () => {
-    if (!prompt) return;
-    setImgUrl(makeUrl(prompt, 1536, 640)); // breites Triptychon
   };
 
   const reset = () => {
@@ -331,17 +351,21 @@ export default function CityDesigner() {
       economy: { services: 45, industry: 25, tech: 20, agri: 10 },
       taxModel: "balanced", incomeTax: 35, corpTax: 25, vat: 19, debt: 40,
     });
-    setPrompt(null); setImgUrl(null);
+    setPrompts(null);
   };
 
   const summaryRow = (label, value) => (
-    <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f3f4f6" }}>
-      <span style={{ color: "#6b7280", fontSize: 14 }}>{label}</span>
-      <span style={{ fontWeight: 700, fontSize: 14, color: "#1f2937" }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid #f3f4f6" }}>
+      <span style={{ color: "#6b7280", fontSize: 13 }}>{label}</span>
+      <span style={{ fontWeight: 700, fontSize: 13, color: "#1f2937" }}>{value}</span>
     </div>
   );
 
-  /* --- Daten für Pie-Charts auf der Ergebnisseite --- */
+  const mobilityTotal = Object.values(city.mobility).reduce((a, b) => a + b, 0) || 1;
+  const energyTotal = Object.values(city.energy).reduce((a, b) => a + b, 0) || 1;
+  const economyTotal = Object.values(city.economy).reduce((a, b) => a + b, 0) || 1;
+  const taxTotal = city.incomeTax + city.corpTax + city.vat || 1;
+
   const mobilityPie = [
     { label: "Auto", value: city.mobility.car, color: "#ef4444" },
     { label: "Fahrrad", value: city.mobility.bike, color: "#10b981" },
@@ -360,20 +384,20 @@ export default function CityDesigner() {
     { label: "Tech / IT", value: city.economy.tech, color: "#8b5cf6" },
     { label: "Landwirtschaft", value: city.economy.agri, color: "#84cc16" },
   ];
-  const populationPie = [
-    { label: "Wohlhabend", value: city.wealth, color: "#6366f1" },
-    { label: "Mittelschicht", value: Math.max(0, 100 - city.wealth), color: "#cbd5e1" },
-  ];
   const taxPie = [
     { label: "Einkommensteuer", value: city.incomeTax, color: "#6366f1" },
     { label: "Unternehmenssteuer", value: city.corpTax, color: "#10b981" },
     { label: "Mehrwertsteuer", value: city.vat, color: "#f59e0b" },
   ];
+  const populationPie = [
+    { label: "Wohlhabend", value: city.wealth, color: "#6366f1" },
+    { label: "Mittelschicht / Arbeiterklasse", value: 100 - city.wealth, color: "#cbd5e1" },
+  ];
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "32px 16px", fontFamily: "system-ui, sans-serif" }}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } * { box-sizing: border-box; }`}</style>
-      <div style={{ width: "100%", maxWidth: step === STEPS.length - 1 ? 1200 : 680 }}>
+      <div style={{ width: "100%", maxWidth: step === STEPS.length - 1 ? 1280 : 680 }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 48, marginBottom: 4 }}>🏙️</div>
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: "#1f2937", letterSpacing: -0.5 }}>CityDesigner</h1>
@@ -437,10 +461,10 @@ export default function CityDesigner() {
         {step === 5 && (
           <Card>
             <SectionTitle icon="🚲" title="Mobilität" sub="Wie bewegen sich die Menschen fort?" />
-            <MixSliders title="Verkehrsmittel-Mix" values={city.mobility} setValues={setObj("mobility")} fields={[
-              { key: "car", label: "Auto", emoji: "🚗", color: "#ef4444" },
-              { key: "bike", label: "Fahrrad", emoji: "🚲", color: "#10b981" },
-              { key: "transit", label: "ÖPNV", emoji: "🚇", color: "#3b82f6" },
+            <MixSliders title="Verkehrsmittel-Mix (Modal Split)" values={city.mobility} setValues={setObj("mobility")} fields={[
+              { key: "car", label: "MIV – Motorisierter Individualverkehr", emoji: "🚗", color: "#ef4444" },
+              { key: "bike", label: "Fahrrad / Mikromobilität", emoji: "🚲", color: "#10b981" },
+              { key: "transit", label: "ÖPNV (Bus, Tram, Metro)", emoji: "🚇", color: "#3b82f6" },
               { key: "foot", label: "Fußgänger", emoji: "🚶", color: "#f59e0b" },
             ]} />
             <NavButtons onBack={back} onNext={next} />
@@ -450,18 +474,18 @@ export default function CityDesigner() {
         {step === 6 && (
           <Card>
             <SectionTitle icon="⚡" title="Wirtschaft & Energie" sub="Womit verdient deine Stadt ihr Geld – und woher kommt der Strom?" />
-            <MixSliders title="Energiemix" values={city.energy} setValues={setObj("energy")} fields={[
-              { key: "renewable", label: "Erneuerbar", emoji: "🌬️", color: "#22c55e" },
-              { key: "fossil", label: "Fossil", emoji: "🛢️", color: "#6b7280" },
-              { key: "nuclear", label: "Atomkraft", emoji: "☢️", color: "#eab308" },
-              { key: "other", label: "Sonstiges", emoji: "🔋", color: "#a855f7" },
+            <MixSliders title="Energiemix (Stromerzeugung)" values={city.energy} setValues={setObj("energy")} fields={[
+              { key: "renewable", label: "Erneuerbare Energien (PV, Wind, Wasser)", emoji: "🌬️", color: "#22c55e" },
+              { key: "fossil", label: "Fossile Energie (Kohle, Öl, Gas)", emoji: "🛢️", color: "#6b7280" },
+              { key: "nuclear", label: "Kernkraft", emoji: "☢️", color: "#eab308" },
+              { key: "other", label: "Sonstiges / Importe", emoji: "🔋", color: "#a855f7" },
             ]} />
             <div style={{ height: 1, background: "#f3f4f6", margin: "12px 0 18px" }} />
-            <MixSliders title="Wirtschaftssektoren" values={city.economy} setValues={setObj("economy")} fields={[
-              { key: "services", label: "Dienstleistung", emoji: "💼", color: "#0ea5e9" },
-              { key: "industry", label: "Industrie", emoji: "🏭", color: "#f97316" },
-              { key: "tech", label: "Tech / IT", emoji: "💻", color: "#8b5cf6" },
-              { key: "agri", label: "Landwirtschaft", emoji: "🌾", color: "#84cc16" },
+            <MixSliders title="Wirtschaftssektoren (Beschäftigungsanteile)" values={city.economy} setValues={setObj("economy")} fields={[
+              { key: "services", label: "Dienstleistungssektor (tertiär)", emoji: "💼", color: "#0ea5e9" },
+              { key: "industry", label: "Industrie & Produktion (sekundär)", emoji: "🏭", color: "#f97316" },
+              { key: "tech", label: "Technologie / IT / Wissenssektor", emoji: "💻", color: "#8b5cf6" },
+              { key: "agri", label: "Landwirtschaft & Rohstoffe (primär)", emoji: "🌾", color: "#84cc16" },
             ]} />
             <NavButtons onBack={back} onNext={next} />
           </Card>
@@ -469,21 +493,21 @@ export default function CityDesigner() {
 
         {step === 7 && (
           <Card>
-            <SectionTitle icon="💰" title="Steuern & Finanzen" sub="Wie finanziert sich deine Stadt?" />
-            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", marginBottom: 10 }}>Steuermodell</p>
+            <SectionTitle icon="💰" title="Steuern & Finanzen" sub="Wie finanziert sich deine Stadt? Fiskal- und Haushaltspolitik." />
+            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", marginBottom: 10 }}>Steuermodell / Staatsform</p>
             <SingleSelect items={taxModels} selected={city.taxModel} onSelect={set("taxModel")} />
             <div style={{ height: 18 }} />
             <SliderField label="Einkommensteuer (Spitzensatz)" value={city.incomeTax} onChange={set("incomeTax")} leftLabel="0 %" rightLabel="100 %" />
-            <SliderField label="Unternehmenssteuer" value={city.corpTax} onChange={set("corpTax")} leftLabel="0 %" rightLabel="100 %" />
-            <SliderField label="Mehrwertsteuer" value={city.vat} onChange={set("vat")} leftLabel="0 %" rightLabel="100 %" />
-            <SliderField label="Staatsverschuldung (% BIP)" value={city.debt} onChange={set("debt")} leftLabel="Schuldenfrei" rightLabel="Hochverschuldet" />
+            <SliderField label="Unternehmenssteuer (Körperschaftssteuer)" value={city.corpTax} onChange={set("corpTax")} leftLabel="0 %" rightLabel="100 %" />
+            <SliderField label="Mehrwertsteuer / Konsumsteuer" value={city.vat} onChange={set("vat")} leftLabel="0 %" rightLabel="100 %" />
+            <SliderField label="Staatsverschuldung (% des BIP)" value={city.debt} onChange={set("debt")} leftLabel="Schuldenfrei" rightLabel="Hochverschuldet" />
             <NavButtons onBack={back} onNext={next} canNext={!!city.taxModel} />
           </Card>
         )}
 
         {step === 8 && (
           <Card>
-            <SectionTitle icon="📋" title={`"${city.name}" – Zusammenfassung`} sub="Überprüfe alles und starte dann die Generierung." />
+            <SectionTitle icon="📋" title={`"${city.name}" – Zusammenfassung`} sub="Überprüfe alle Angaben und starte dann die KI-Bildgenerierung." />
             <div style={{ background: "#f9fafb", borderRadius: 14, padding: 20, marginBottom: 8 }}>
               {summaryRow("Stadtname", city.name)}
               {summaryRow("Bebauungsdichte", `${city.density}%`)}
@@ -502,60 +526,112 @@ export default function CityDesigner() {
               {summaryRow("Mehrwertsteuer", `${city.vat}%`)}
               {summaryRow("Staatsverschuldung", `${city.debt}% BIP`)}
             </div>
+            <div style={{ background: "#fef3c7", borderRadius: 10, padding: "10px 14px", marginBottom: 8, fontSize: 12, color: "#92400e" }}>
+              ⚠️ Jedes der 3 Bilder wird separat per Knopfdruck generiert – so sparst du Tokens und kannst einzelne Bilder neu erstellen.
+            </div>
             <NavButtons onBack={back} onNext={startGeneration} nextLabel="🏙️ Stadt erstellen →" />
           </Card>
         )}
 
-        {step === STEPS.length - 1 && prompt && (
+        {step === STEPS.length - 1 && prompts && (
           <div>
-            <div style={{ textAlign: "center", marginBottom: 24 }}>
-              <div style={{ fontSize: 40, marginBottom: 6 }}>🎉</div>
-              <h2 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: "#1f2937" }}>{city.name}</h2>
-              <p style={{ color: "#6b7280", fontSize: 13, margin: "6px 0 0" }}>Ein einziges KI-Bild zeigt Innenstadt, typischen Bewohner und Vogelperspektive.</p>
+            {/* HEADER */}
+            <div style={{ textAlign: "center", marginBottom: 28 }}>
+              <div style={{ fontSize: 42, marginBottom: 6 }}>🎉</div>
+              <h2 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: "#1f2937" }}>{city.name}</h2>
+              <p style={{ color: "#6b7280", fontSize: 13, margin: "6px 0 0" }}>Generiere die drei Stadtansichten einzeln per Knopfdruck — jedes Bild kostet einen Token.</p>
             </div>
 
-            <BigImageCard prompt={prompt} url={imgUrl} onGenerate={generateImage} />
+            {/* 3 BILD-CARDS */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 20, marginBottom: 32 }}>
+              <ImageCard
+                title="Innenstadt"
+                icon="🏙️"
+                label="Straßenperspektive · Stadtbild · Architektur"
+                prompt={prompts.downtown}
+              />
+              <ImageCard
+                title="Typischer Bewohner"
+                icon="👤"
+                label="Portrait · Sozialstruktur · Kultur"
+                prompt={prompts.resident}
+              />
+              <ImageCard
+                title="Vogelperspektive"
+                icon="🛸"
+                label="Drohnenaufnahme · Stadtstruktur · Raumplanung"
+                prompt={prompts.aerial}
+              />
+            </div>
 
-            {/* ECKDATEN-INFOKASTEN */}
-            <div style={{ background: "#fff", borderRadius: 20, padding: 24, marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
-              <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#1f2937" }}>📊 Eckdaten von {city.name}</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 }}>
-                <Stat label="Architektur" value={architectureStyles.find(s => s.id === city.archStyle)?.label || "—"} emoji="🏗️" />
-                <Stat label="Klima" value={climates.find(s => s.id === city.climate)?.label || "—"} emoji="🌤️" />
-                <Stat label="Stimmung" value={moods.find(s => s.id === city.mood)?.label || "—"} emoji="✨" />
-                <Stat label="Bebauungsdichte" value={`${city.density}%`} emoji="🏢" />
-                <Stat label="Grünanteil" value={`${city.greenery}%`} emoji="🌳" />
-                <Stat label="Modernität" value={`${city.modernity}%`} emoji="🚀" />
-                <Stat label="Steuermodell" value={taxModels.find(s => s.id === city.taxModel)?.label || "—"} emoji="💰" />
-                <Stat label="Staatsverschuldung" value={`${city.debt}% BIP`} emoji="📉" />
+            {/* ECKDATEN — SCHULTAUGLICH */}
+            <div style={{ background: "#fff", borderRadius: 20, padding: 28, marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.06)", border: "1px solid #e5e7eb" }}>
+              <h3 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 900, color: "#1f2937" }}>📊 Stadtprofil: {city.name}</h3>
+              <p style={{ margin: "0 0 20px", fontSize: 12, color: "#6b7280" }}>Eckdaten für die Stadtplanung · Geographie-Schulprojekt</p>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
+                {/* Raum & Struktur */}
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: "#6366f1", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, borderBottom: "2px solid #6366f1", paddingBottom: 4 }}>🏗️ Raum & Stadtstruktur</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <Stat label="Architekturstil" value={architectureStyles.find(s => s.id === city.archStyle)?.label || "—"} emoji="🏛️" />
+                    <Stat label="Bebauungsdichte" value={city.density > 66 ? "Hoch (urban verdichtet)" : city.density > 33 ? "Mittel (gemischt)" : "Niedrig (suburban)"} emoji="🏢" />
+                    <Stat label="Grünflächenanteil" value={city.greenery > 66 ? "Hoch (> 30 %)" : city.greenery > 33 ? "Mittel (15–30 %)" : "Niedrig (< 15 %)"} emoji="🌳" />
+                    <Stat label="Modernität / Baualter" value={city.modernity > 66 ? "Modern (Neubau dominant)" : city.modernity > 33 ? "Gemischt (Alt- und Neubau)" : "Historisch (Altbau dominant)"} emoji="🕰️" />
+                  </div>
+                </div>
+
+                {/* Bevölkerung */}
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: "#10b981", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, borderBottom: "2px solid #10b981", paddingBottom: 4 }}>👥 Bevölkerung & Sozialstruktur</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <Stat label="Wohlstandsniveau" value={city.wealth > 66 ? "Hoch (wohlhabend)" : city.wealth > 33 ? "Mittel (Mittelschicht)" : "Niedrig (Arbeiterklasse)"} emoji="💰" />
+                    <Stat label="Kulturelle Diversität" value={city.diversity > 66 ? "Sehr hoch (kosmopolitisch)" : city.diversity > 33 ? "Mittel (multikulturell)" : "Niedrig (homogen)"} emoji="🌍" />
+                    <Stat label="Altersstruktur" value={city.ageProfile > 66 ? "Überalternd (Seniorenanteil hoch)" : city.ageProfile < 34 ? "Jung (Studenten- / Arbeitsstadt)" : "Ausgeglichen"} emoji="📊" />
+                    <Stat label="Klima / Lage" value={climates.find(s => s.id === city.climate)?.label || "—"} emoji="🌤️" />
+                  </div>
+                </div>
+
+                {/* Finanzen */}
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: "#f59e0b", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, borderBottom: "2px solid #f59e0b", paddingBottom: 4 }}>💰 Fiskal- & Finanzpolitik</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <Stat label="Steuermodell" value={taxModels.find(s => s.id === city.taxModel)?.label || "—"} emoji="⚖️" />
+                    <Stat label="Einkommensteuer (Spitzensatz)" value={`${city.incomeTax} %`} emoji="📈" />
+                    <Stat label="Körperschaftssteuer" value={`${city.corpTax} %`} emoji="🏢" />
+                    <Stat label="Mehrwertsteuer" value={`${city.vat} %`} emoji="🧾" />
+                    <Stat label="Staatsverschuldung" value={`${city.debt} % des BIP`} emoji="📉" />
+                  </div>
+                </div>
+
+                {/* Atmosphäre */}
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, borderBottom: "2px solid #8b5cf6", paddingBottom: 4 }}>✨ Atmosphäre & Identität</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <Stat label="Stadtcharakter / Stimmung" value={moods.find(s => s.id === city.mood)?.label || "—"} emoji="🎭" />
+                    <Stat label="Tageszeit / Lichtcharakter" value={daytimes.find(s => s.id === city.daytime)?.label || "—"} emoji="🕐" />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* PIE-CHARTS */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 18, marginBottom: 24 }}>
-              <PieChart title="🚲 Mobilitätsmix" data={mobilityPie} />
-              <PieChart title="⚡ Energiemix" data={energyPie} />
-              <PieChart title="💼 Wirtschaftssektoren" data={economyPie} />
-              <PieChart title="💰 Steuern (Sätze)" data={taxPie} />
-              <PieChart title="👥 Wohlstandsverteilung" data={populationPie} />
+            {/* PIE CHARTS — SCHULTAUGLICH */}
+            <div style={{ background: "#fff", borderRadius: 20, padding: 28, marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.06)", border: "1px solid #e5e7eb" }}>
+              <h3 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 900, color: "#1f2937" }}>📈 Datenanalyse: {city.name}</h3>
+              <p style={{ margin: "0 0 20px", fontSize: 12, color: "#6b7280" }}>Kreisdiagramme zur Visualisierung der Stadtplanung · Geographie-Schulprojekt</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+                <PieChart title="Modal Split – Verkehrsmittelwahl" data={mobilityPie} />
+                <PieChart title="Energiemix – Stromerzeugung" data={energyPie} />
+                <PieChart title="Wirtschaftsstruktur – Sektoren" data={economyPie} />
+                <PieChart title="Steuerstruktur – Steuerarten" data={taxPie} />
+                <PieChart title="Sozialstruktur – Wohlstandsverteilung" data={populationPie} />
+              </div>
             </div>
 
             <button onClick={reset} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "2px solid #e5e7eb", background: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14, color: "#374151" }}>🔄 Neue Stadt entwerfen</button>
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   KLEINE STAT-KACHEL für den Eckdaten-Infokasten
-   ============================================================ */
-function Stat({ label, value, emoji }) {
-  return (
-    <div style={{ background: "#f9fafb", borderRadius: 12, padding: "12px 14px" }}>
-      <div style={{ fontSize: 11, color: "#6b7280", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>{emoji} {label}</div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: "#1f2937" }}>{value}</div>
     </div>
   );
 }
