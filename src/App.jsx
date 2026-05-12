@@ -78,10 +78,10 @@ function buildPrompts(city) {
     industrial: "industrial and gritty, smoke, heavy machinery visible",
     romantic: "romantic and atmospheric, soft glow, intimate",
   };
-  const style = styleMap || "mixed architecture";
-  const climate = climateMap || "temperate climate";
-  const time = timeMap || "in daylight";
-  const mood = moodMap || "lively";
+  const style = styleMap[city.archStyle] || "mixed architecture";
+  const climate = climateMap[city.climate] || "temperate climate";
+  const time = timeMap[city.daytime] || "in daylight";
+  const mood = moodMap[city.mood] || "lively";
   const density = city.density > 66 ? "densely packed urban high-rise" : city.density > 33 ? "medium density mixed-use" : "sparse low-rise suburban";
   const greenery = city.greenery > 66 ? "abundant parks, tree-lined streets, green roofs, urban gardens" : city.greenery > 33 ? "some parks and street trees" : "minimal vegetation, mostly concrete";
   const modern = city.modernity > 66 ? "ultra-modern contemporary" : city.modernity > 33 ? "blend of historic and modern" : "historic and traditional";
@@ -231,20 +231,20 @@ const SliderField = ({ label, value, onChange, leftLabel, rightLabel }) => (
 );
 
 const MixSliders = ({ title, values, setValues, fields }) => {
-  const total = fields.reduce((s, f) => s + (values || 0), 0) || 1;
+  const total = fields.reduce((s, f) => s + (values[f.key] || 0), 0) || 1;
   return (
     <div style={{ marginBottom: 16 }}>
       <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", marginBottom: 12 }}>{title}</p>
       {fields.map(f => {
-        const pct = Math.round(((values || 0) / total) * 100);
+        const pct = Math.round(((values[f.key] || 0) / total) * 100);
         return (
           <div key={f.key} style={{ marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
               <span style={{ fontSize: 13, color: "#374151" }}>{f.emoji} {f.label}</span>
               <span style={{ fontSize: 12, fontWeight: 700, color: f.color }}>{pct}%</span>
             </div>
-            <input type="range" min={0} max={100} value={values || 0}
-              onChange={e => setValues({ ...values, : Number(e.target.value) })}
+            <input type="range" min={0} max={100} value={values[f.key] || 0}
+              onChange={e => setValues({ ...values, [f.key]: Number(e.target.value) })}
               style={{ width: "100%", accentColor: f.color }} />
           </div>
         );
@@ -360,11 +360,6 @@ export default function CityDesigner() {
       <span style={{ fontWeight: 700, fontSize: 13, color: "#1f2937" }}>{value}</span>
     </div>
   );
-
-  const mobilityTotal = Object.values(city.mobility).reduce((a, b) => a + b, 0) || 1;
-  const energyTotal = Object.values(city.energy).reduce((a, b) => a + b, 0) || 1;
-  const economyTotal = Object.values(city.economy).reduce((a, b) => a + b, 0) || 1;
-  const taxTotal = city.incomeTax + city.corpTax + city.vat || 1;
 
   const mobilityPie = [
     { label: "Auto", value: city.mobility.car, color: "#ef4444" },
@@ -535,7 +530,6 @@ export default function CityDesigner() {
 
         {step === STEPS.length - 1 && prompts && (
           <div>
-            {/* HEADER */}
             <div style={{ textAlign: "center", marginBottom: 28 }}>
               <div style={{ fontSize: 42, marginBottom: 6 }}>🎉</div>
               <h2 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: "#1f2937" }}>{city.name}</h2>
@@ -544,33 +538,16 @@ export default function CityDesigner() {
 
             {/* 3 BILD-CARDS */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 20, marginBottom: 32 }}>
-              <ImageCard
-                title="Innenstadt"
-                icon="🏙️"
-                label="Straßenperspektive · Stadtbild · Architektur"
-                prompt={prompts.downtown}
-              />
-              <ImageCard
-                title="Typischer Bewohner"
-                icon="👤"
-                label="Portrait · Sozialstruktur · Kultur"
-                prompt={prompts.resident}
-              />
-              <ImageCard
-                title="Vogelperspektive"
-                icon="🛸"
-                label="Drohnenaufnahme · Stadtstruktur · Raumplanung"
-                prompt={prompts.aerial}
-              />
+              <ImageCard title="Innenstadt" icon="🏙️" label="Straßenperspektive · Stadtbild · Architektur" prompt={prompts.downtown} />
+              <ImageCard title="Typischer Bewohner" icon="👤" label="Portrait · Sozialstruktur · Kultur" prompt={prompts.resident} />
+              <ImageCard title="Vogelperspektive" icon="🛸" label="Drohnenaufnahme · Stadtstruktur · Raumplanung" prompt={prompts.aerial} />
             </div>
 
-            {/* ECKDATEN — SCHULTAUGLICH */}
+            {/* ECKDATEN */}
             <div style={{ background: "#fff", borderRadius: 20, padding: 28, marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.06)", border: "1px solid #e5e7eb" }}>
               <h3 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 900, color: "#1f2937" }}>📊 Stadtprofil: {city.name}</h3>
               <p style={{ margin: "0 0 20px", fontSize: 12, color: "#6b7280" }}>Eckdaten für die Stadtplanung · Geographie-Schulprojekt</p>
-
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-                {/* Raum & Struktur */}
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 800, color: "#6366f1", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, borderBottom: "2px solid #6366f1", paddingBottom: 4 }}>🏗️ Raum & Stadtstruktur</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -580,8 +557,6 @@ export default function CityDesigner() {
                     <Stat label="Modernität / Baualter" value={city.modernity > 66 ? "Modern (Neubau dominant)" : city.modernity > 33 ? "Gemischt (Alt- und Neubau)" : "Historisch (Altbau dominant)"} emoji="🕰️" />
                   </div>
                 </div>
-
-                {/* Bevölkerung */}
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 800, color: "#10b981", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, borderBottom: "2px solid #10b981", paddingBottom: 4 }}>👥 Bevölkerung & Sozialstruktur</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -591,8 +566,6 @@ export default function CityDesigner() {
                     <Stat label="Klima / Lage" value={climates.find(s => s.id === city.climate)?.label || "—"} emoji="🌤️" />
                   </div>
                 </div>
-
-                {/* Finanzen */}
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 800, color: "#f59e0b", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, borderBottom: "2px solid #f59e0b", paddingBottom: 4 }}>💰 Fiskal- & Finanzpolitik</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -603,8 +576,6 @@ export default function CityDesigner() {
                     <Stat label="Staatsverschuldung" value={`${city.debt} % des BIP`} emoji="📉" />
                   </div>
                 </div>
-
-                {/* Atmosphäre */}
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 800, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, borderBottom: "2px solid #8b5cf6", paddingBottom: 4 }}>✨ Atmosphäre & Identität</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -615,7 +586,7 @@ export default function CityDesigner() {
               </div>
             </div>
 
-            {/* PIE CHARTS — SCHULTAUGLICH */}
+            {/* PIE CHARTS */}
             <div style={{ background: "#fff", borderRadius: 20, padding: 28, marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.06)", border: "1px solid #e5e7eb" }}>
               <h3 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 900, color: "#1f2937" }}>📈 Datenanalyse: {city.name}</h3>
               <p style={{ margin: "0 0 20px", fontSize: 12, color: "#6b7280" }}>Kreisdiagramme zur Visualisierung der Stadtplanung · Geographie-Schulprojekt</p>
