@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+/* ============================================================
+   AUSWAHL-OPTIONEN
+   ============================================================ */
 const architectureStyles = [
   { id: "european", label: "Europäisch", emoji: "🏛️", desc: "Klassische Altstadt, Gründerzeit" },
   { id: "asian", label: "Asiatisch", emoji: "🏯", desc: "Pagoden, dichte Märkte" },
@@ -29,87 +32,62 @@ const moods = [
   { id: "industrial", label: "Industrial", emoji: "🏭" },
   { id: "romantic", label: "Romantisch", emoji: "💫" },
 ];
-const visualStyles = [
-  { id: "realistic", label: "Realistisch", emoji: "📷", desc: "Fotorealistisch, cineastisch" },
-  { id: "isometric", label: "Isometrisch", emoji: "🧊", desc: "Wie SimCity / Diorama" },
-  { id: "illustrative", label: "Illustrativ", emoji: "🎨", desc: "Skizze / Aquarell" },
-  { id: "blueprint", label: "Planerisch", emoji: "📐", desc: "Architektur-Visualisierung" },
-];
-const cityGoals = [
-  { id: "climate", label: "Klimaanpassung", emoji: "🌍" },
-  { id: "affordable", label: "Bezahlbar Wohnen", emoji: "🏠" },
-  { id: "transit", label: "Starker ÖPNV", emoji: "🚊" },
-  { id: "industry", label: "Wirtschaft/Industrie", emoji: "🏭" },
-  { id: "tourism", label: "Tourismus", emoji: "🗺️" },
-  { id: "education", label: "Bildung", emoji: "🎓" },
-];
-const taxStrategies = [
-  { id: "low", label: "Niedrige Steuern", emoji: "💸", desc: "Unternehmen anziehen" },
-  { id: "balanced", label: "Ausgewogen", emoji: "⚖️", desc: "Mittlerer Weg" },
-  { id: "strong", label: "Hohe Steuern", emoji: "🏛️", desc: "Starke öffentliche Leistungen" },
-];
-const energyOptions = [
-  { id: "pv", label: "PV-Dächer", emoji: "☀️" },
-  { id: "wind", label: "Windkraft", emoji: "🌬️" },
-  { id: "geothermal", label: "Geothermie", emoji: "🌋" },
-  { id: "districtheat", label: "Fernwärme", emoji: "♨️" },
-  { id: "sponge", label: "Schwammstadt", emoji: "💧" },
+const taxModels = [
+  { id: "low", label: "Niedrigsteuer", emoji: "💸", desc: "Schlanker Staat, wenig Umverteilung" },
+  { id: "balanced", label: "Ausgewogen", emoji: "⚖️", desc: "Mittlere Steuern, solide Daseinsvorsorge" },
+  { id: "social", label: "Sozialstaat", emoji: "🤝", desc: "Hohe Steuern, breite Leistungen" },
+  { id: "corporate", label: "Wirtschaftsfreundlich", emoji: "🏢", desc: "Niedrige Unternehmenssteuern" },
 ];
 
 const STEPS = [
   "Willkommen", "Charakter", "Architektur", "Atmosphäre",
-  "Bevölkerung", "Verkehr", "Wirtschaft", "Energie",
-  "Finanzen", "Stil", "Zusammenfassung", "Deine Stadt"
+  "Bevölkerung", "Mobilität", "Wirtschaft & Energie",
+  "Finanzen", "Zusammenfassung", "Deine Stadt"
 ];
 
-// ─── Prompt-Builder: EIN Collage-Prompt ────────────────────────────────────
-function buildCollagePrompt(city) {
+/* ============================================================
+   PROMPT-BUILDER  (EIN kombinierter 3-Panel-Prompt)
+   ============================================================ */
+function buildCombinedPrompt(city) {
   const styleMap = {
     european: "European classical architecture",
     asian: "Asian architecture with pagodas",
-    futuristic: "futuristic sci-fi architecture",
+    futuristic: "futuristic sci-fi architecture with glass and steel",
     american: "American urban skyline",
     mediterranean: "Mediterranean white-washed buildings",
     nordic: "Nordic minimalist wooden architecture",
   };
   const climateMap = {
-    tropical: "tropical lush vegetation",
-    desert: "arid desert landscape",
-    temperate: "temperate green surroundings",
-    arctic: "snowy arctic environment",
+    tropical: "tropical lush vegetation", desert: "arid desert landscape",
+    temperate: "temperate green surroundings", arctic: "snowy arctic environment",
     rainy: "rainy misty atmosphere",
   };
   const timeMap = {
-    dawn: "at dawn",
-    day: "in bright daylight",
-    golden: "in golden hour",
-    night: "at night with city lights",
+    dawn: "at dawn with soft pink light", day: "in bright daylight",
+    golden: "in golden hour warm light", night: "at night with glowing city lights",
     storm: "during a dramatic storm",
   };
-  const visualMap = {
-    realistic: "photorealistic cinematic urban photography, ultra-detailed, 8K",
-    isometric: "isometric diorama illustration, SimCity-like, clean vector style",
-    illustrative: "watercolor architectural illustration, hand-drawn, soft colors",
-    blueprint: "architectural visualization render, clean planning style, soft daylight",
+  const moodMap = {
+    vibrant: "vibrant and lively", peaceful: "calm and peaceful",
+    mysterious: "dark and mysterious", industrial: "industrial and gritty",
+    romantic: "romantic and atmospheric",
   };
-
   const style = styleMap[city.archStyle] || "mixed architecture";
   const climate = climateMap[city.climate] || "temperate climate";
   const time = timeMap[city.daytime] || "in daylight";
-  const visual = visualMap[city.visualStyle] || visualMap.realistic;
-
-  const density = city.density > 66 ? "dense urban" : city.density > 33 ? "medium density" : "sparse low-rise";
-  const greenery = city.greenery > 66 ? "lots of parks and trees" : city.greenery > 33 ? "some greenery" : "minimal vegetation";
+  const mood = moodMap[city.mood] || "lively";
+  const density = city.density > 66 ? "densely packed urban" : city.density > 33 ? "medium density" : "sparse low-rise";
+  const greenery = city.greenery > 66 ? "with lots of parks and trees" : city.greenery > 33 ? "with some greenery" : "with minimal vegetation";
+  const modern = city.modernity > 66 ? "ultra-modern" : city.modernity > 33 ? "blend of old and new" : "historic and traditional";
+  const wealth = city.wealth > 66 ? "wealthy and affluent" : city.wealth > 33 ? "middle-class" : "working-class";
+  const age = city.ageProfile > 60 ? "elderly population" : city.ageProfile < 40 ? "young population" : "mixed-age population";
 
   return (
-    `A single image divided into THREE clear horizontal panels, separated by thin white dividers, ` +
-    `urban planning visualization for the city "${city.name}", ${visual}. ` +
-    `LEFT PANEL — RESIDENT VIEW: a typical citizen of ${city.name} in everyday street life, ${style}, ${climate}, ${time}, friendly atmosphere. ` +
-    `MIDDLE PANEL — BIRD'S EYE VIEW: aerial drone view of ${city.name} showing ${density} urban layout, ${greenery}, district structure with green corridors and main transport axes, ${style}. ` +
-    `RIGHT PANEL — CITY CENTER VIEW: street-level view of the inner city of ${city.name}, lively pedestrian zone, public transit, ${style}, ${climate}, ${time}. ` +
-    `BELOW the three panels: a clean dark info bar across the full width with white sans-serif text showing key urban planning data of ${city.name} ` +
-    `(population, density, modal split, green share, energy goal, social housing, budget priorities). ` +
-    `Cohesive lighting, consistent style across all three panels, professional urban planning poster look.`
+    `Three-panel triptych collage of the city ${city.name}, seamless cinematic composition, ` +
+    `LEFT PANEL: photorealistic wide-angle street-level view of ${density} downtown, ${style}, ${modern}, ${greenery}, ${mood}, ${time}; ` +
+    `CENTER PANEL: photorealistic portrait of a typical resident, ${wealth} ${age}, dressed reflecting ${style} culture and ${climate}, candid street photography, natural lighting; ` +
+    `RIGHT PANEL: breathtaking aerial bird's-eye drone view from 500m, ${style}, ${density} layout, ${climate}, ${greenery}, ${time}; ` +
+    `consistent color palette across all three panels, ultra-detailed, 8K, hyperrealistic, cinematic lighting, professional photography`
   );
 }
 
@@ -118,80 +96,141 @@ const makeUrl = (prompt, w, h) => {
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true&model=flux&seed=${seed}`;
 };
 
-// ─── Bild-Karte für die Collage ────────────────────────────────────────────
-const CollageCard = ({ prompt, url, onGenerate }) => {
+/* ============================================================
+   PIE-CHART KOMPONENTE (Pure SVG, keine Lib nötig)
+   ============================================================ */
+const PieChart = ({ title, data, size = 180 }) => {
+  const total = data.reduce((s, d) => s + d.value, 0) || 1;
+  const cx = size / 2, cy = size / 2, r = size / 2 - 4;
+  let acc = 0;
+  const slices = data.map((d, i) => {
+    const start = (acc / total) * Math.PI * 2 - Math.PI / 2;
+    acc += d.value;
+    const end = (acc / total) * Math.PI * 2 - Math.PI / 2;
+    const x1 = cx + r * Math.cos(start), y1 = cy + r * Math.sin(start);
+    const x2 = cx + r * Math.cos(end), y2 = cy + r * Math.sin(end);
+    const large = end - start > Math.PI ? 1 : 0;
+    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+    return { path, color: d.color, label: d.label, value: d.value, pct: Math.round((d.value / total) * 100) };
+  });
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, padding: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+      <h4 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 800, color: "#1f2937", textAlign: "center" }}>{title}</h4>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          {slices.map((s, i) => (
+            <path key={i} d={s.path} fill={s.color} stroke="#fff" strokeWidth="2" />
+          ))}
+        </svg>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12 }}>
+          {slices.map((s, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ width: 12, height: 12, borderRadius: 3, background: s.color, display: "inline-block" }} />
+              <span style={{ color: "#374151", fontWeight: 600 }}>{s.label}</span>
+              <span style={{ color: "#6b7280", marginLeft: "auto" }}>{s.pct}%</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   GROßES BILD-CARD (3-Panel)
+   ============================================================ */
+const BigImageCard = ({ prompt, url, onGenerate }) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [prevUrl, setPrevUrl] = useState(null);
   if (url !== prevUrl) { setPrevUrl(url); setLoaded(false); setError(false); }
-
   return (
-    <div style={{ borderRadius: 20, border: "2px solid #6366f1", overflow: "hidden", marginBottom: 20, background: "#0f172a" }}>
-      <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "2px solid #6366f1" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 22 }}>🖼️</span>
-          <span style={{ fontWeight: 800, fontSize: 15, color: "#f1f5f9" }}>3-Panel Stadtplanungs-Collage</span>
+    <div style={{ borderRadius: 24, border: "2px solid #6366f1", overflow: "hidden", marginBottom: 24, background: "#0f172a" }}>
+      <div style={{ padding: "16px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "2px solid #6366f1" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 26 }}>🎨</span>
+          <span style={{ fontWeight: 800, fontSize: 16, color: "#f1f5f9" }}>3-Panel Stadtansicht (Innenstadt · Bewohner · Vogelperspektive)</span>
         </div>
         {url && loaded && (
-          <button onClick={onGenerate} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, border: "1px solid #6366f1", background: "transparent", color: "#6366f1", cursor: "pointer" }}>🔁 Neu generieren</button>
+          <button onClick={onGenerate} style={{ fontSize: 12, padding: "6px 14px", borderRadius: 10, border: "1px solid #6366f1", background: "transparent", color: "#a5b4fc", cursor: "pointer", fontWeight: 700 }}>🔁 Neu generieren</button>
         )}
       </div>
-      <div style={{ minHeight: 240, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+      <div style={{ minHeight: 360, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
         {!url && (
-          <div style={{ padding: 32, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-            <span style={{ fontSize: 40 }}>🎨</span>
-            <button onClick={onGenerate} style={{ padding: "13px 28px", borderRadius: 14, border: "none", background: "#6366f1", color: "#fff", fontWeight: 800, fontSize: 14, cursor: "pointer" }}>🖼️ Collage generieren</button>
+          <div style={{ padding: 60, display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
+            <span style={{ fontSize: 64 }}>🏙️</span>
+            <button onClick={onGenerate} style={{ padding: "16px 36px", borderRadius: 16, border: "none", background: "#6366f1", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", boxShadow: "0 4px 20px rgba(99,102,241,0.4)" }}>
+              ✨ Stadtbild generieren
+            </button>
+            <span style={{ color: "#94a3b8", fontSize: 12 }}>Ein einziges großes Bild — schont den Server</span>
           </div>
         )}
         {url && !loaded && !error && (
-          <div style={{ padding: 32, display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 42, height: 42, border: "3px solid #6366f1", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.9s linear infinite" }} />
-            <span style={{ color: "#94a3b8", fontSize: 13 }}>KI generiert Collage… (kann 30–60 Sek. dauern)</span>
+          <div style={{ padding: 60, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 56, height: 56, border: "4px solid #6366f1", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.9s linear infinite" }} />
+            <span style={{ color: "#94a3b8", fontSize: 14 }}>KI generiert dein Stadtbild… (kann 30–60 Sek. dauern)</span>
           </div>
         )}
         {error && (
-          <div style={{ padding: 32, textAlign: "center" }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
-            <p style={{ color: "#f87171", fontSize: 13, margin: "0 0 12px" }}>Generierung fehlgeschlagen.</p>
-            <button onClick={onGenerate} style={{ padding: "9px 22px", borderRadius: 10, border: "none", background: "#6366f1", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>Nochmals versuchen</button>
+          <div style={{ padding: 50, textAlign: "center" }}>
+            <div style={{ fontSize: 42, marginBottom: 10 }}>⚠️</div>
+            <p style={{ color: "#f87171", fontSize: 14, margin: "0 0 14px" }}>Generierung fehlgeschlagen.</p>
+            <button onClick={onGenerate} style={{ padding: "11px 26px", borderRadius: 12, border: "none", background: "#6366f1", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Nochmals versuchen</button>
           </div>
         )}
         {url && (
-          <img src={url} alt="Stadtplanungs-Collage" onLoad={() => setLoaded(true)} onError={() => { setError(true); setLoaded(false); }} style={{ width: "100%", display: loaded ? "block" : "none" }} />
+          <img src={url} alt="Stadt-Triptychon" onLoad={() => setLoaded(true)} onError={() => { setError(true); setLoaded(false); }} style={{ width: "100%", display: loaded ? "block" : "none" }} />
         )}
       </div>
-      <details style={{ padding: "6px 16px 10px", borderTop: "1px solid #1e293b" }}>
-        <summary style={{ fontSize: 11, color: "#4b5563", cursor: "pointer", userSelect: "none" }}>Prompt anzeigen</summary>
-        <div style={{ fontFamily: "monospace", fontSize: 11, color: "#6b7280", lineHeight: 1.7, marginTop: 6, wordBreak: "break-word" }}>{prompt}</div>
+      <details style={{ padding: "8px 18px 12px", borderTop: "1px solid #1e293b" }}>
+        <summary style={{ fontSize: 11, color: "#64748b", cursor: "pointer", userSelect: "none" }}>Prompt anzeigen</summary>
+        <div style={{ fontFamily: "monospace", fontSize: 11, color: "#94a3b8", lineHeight: 1.7, marginTop: 8, wordBreak: "break-word" }}>{prompt}</div>
       </details>
     </div>
   );
 };
 
+/* ============================================================
+   FORMULAR-BAUSTEINE
+   ============================================================ */
 const SliderField = ({ label, value, onChange, leftLabel, rightLabel }) => (
-  <div style={{ marginBottom: 24 }}>
+  <div style={{ marginBottom: 22 }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
       <span style={{ fontWeight: 700, fontSize: 14, color: "#374151" }}>{label}</span>
       <span style={{ fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 999, background: "#6366f1", color: "#fff" }}>{value}%</span>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-      <span style={{ fontSize: 11, color: "#9ca3af", width: 80, textAlign: "right" }}>{leftLabel}</span>
+      <span style={{ fontSize: 11, color: "#9ca3af", width: 90, textAlign: "right" }}>{leftLabel}</span>
       <input type="range" min={0} max={100} value={value} onChange={e => onChange(Number(e.target.value))} style={{ flex: 1, accentColor: "#6366f1" }} />
-      <span style={{ fontSize: 11, color: "#9ca3af", width: 80 }}>{rightLabel}</span>
+      <span style={{ fontSize: 11, color: "#9ca3af", width: 90 }}>{rightLabel}</span>
     </div>
   </div>
 );
 
-const NumberField = ({ label, value, onChange, placeholder, suffix }) => (
-  <div style={{ marginBottom: 18 }}>
-    <label style={{ display: "block", fontWeight: 700, fontSize: 13, color: "#374151", marginBottom: 6 }}>{label}</label>
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "2px solid #e5e7eb", fontSize: 14, color: "#1f2937", background: "#fff", outline: "none" }} />
-      {suffix && <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>{suffix}</span>}
+/* Mehrere Slider, deren Summe normalisiert auf 100 angezeigt wird */
+const MixSliders = ({ title, values, setValues, fields }) => {
+  const total = fields.reduce((s, f) => s + (values[f.key] || 0), 0) || 1;
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", marginBottom: 12 }}>{title}</p>
+      {fields.map(f => {
+        const pct = Math.round(((values[f.key] || 0) / total) * 100);
+        return (
+          <div key={f.key} style={{ marginBottom: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+              <span style={{ fontSize: 13, color: "#374151" }}>{f.emoji} {f.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: f.color }}>{pct}%</span>
+            </div>
+            <input type="range" min={0} max={100} value={values[f.key] || 0}
+              onChange={e => setValues({ ...values, [f.key]: Number(e.target.value) })}
+              style={{ width: "100%", accentColor: f.color }} />
+          </div>
+        );
+      })}
+      <p style={{ fontSize: 11, color: "#9ca3af", margin: "4px 0 0" }}>Werte werden automatisch auf 100 % normalisiert.</p>
     </div>
-  </div>
-);
+  );
+};
 
 const ChoiceCard = ({ item, selected, onSelect }) => (
   <button onClick={() => onSelect(item.id)} style={{
@@ -206,31 +245,24 @@ const ChoiceCard = ({ item, selected, onSelect }) => (
     {item.desc && <span style={{ fontSize: 11, color: "#6b7280", marginTop: 4, textAlign: "center" }}>{item.desc}</span>}
   </button>
 );
-
 const SingleSelect = ({ items, selected, onSelect }) => (
   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12 }}>
     {items.map(item => <ChoiceCard key={item.id} item={item} selected={selected === item.id} onSelect={onSelect} />)}
   </div>
 );
 
-const MultiSelect = ({ items, selected, onToggle }) => (
-  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 12 }}>
-    {items.map(item => (
-      <ChoiceCard key={item.id} item={item} selected={selected.includes(item.id)} onSelect={() => onToggle(item.id)} />
-    ))}
-  </div>
-);
-
-const ProgressBar = ({ step }) => (
-  <div style={{ display: "flex", gap: 4, marginBottom: 32, justifyContent: "center" }}>
-    {STEPS.map((s, i) => (
+const ProgressBar = ({ step, total }) => (
+  <div style={{ display: "flex", gap: 5, marginBottom: 28, justifyContent: "center" }}>
+    {Array.from({ length: total }).map((_, i) => (
       <div key={i} style={{ flex: 1, height: 4, borderRadius: 999, background: i <= step ? "#6366f1" : "#e5e7eb", transition: "background 0.3s", maxWidth: 50 }} />
     ))}
   </div>
 );
 
 const Card = ({ children }) => (
-  <div style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 4px 32px rgba(0,0,0,0.08)" }}>{children}</div>
+  <div style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 4px 32px rgba(0,0,0,0.08)" }}>
+    {children}
+  </div>
 );
 
 const SectionTitle = ({ icon, title, sub }) => (
@@ -248,104 +280,122 @@ const NavButtons = ({ onBack, onNext, nextLabel = "Weiter →", canNext = true }
   </div>
 );
 
+/* ============================================================
+   HAUPTKOMPONENTE
+   ============================================================ */
 export default function CityDesigner() {
   const [step, setStep] = useState(0);
   const [city, setCity] = useState({
     name: "",
-    // Charakter
     density: 50, modernity: 50, greenery: 50,
-    // Stil & Atmosphäre
-    archStyle: "", climate: "", daytime: "day", mood: "", visualStyle: "realistic",
-    // Bevölkerung
+    archStyle: "", climate: "", daytime: "day", mood: "",
     wealth: 50, diversity: 50, ageProfile: 50,
-    popNow: "", popTarget: "", socialHousing: "25",
-    // Verkehr
-    modalTransit: 30, modalBike: 25, modalWalk: 25, modalCar: 20,
-    parkingPolicy: "managed",
+    // Mobilität
+    mobility: { car: 30, bike: 25, transit: 30, foot: 15 },
+    // Energie
+    energy: { renewable: 40, fossil: 35, nuclear: 15, other: 10 },
     // Wirtschaft
-    mainIndustry: "", goals: [],
-    // Energie / Klima
-    energyOptions: [], energyYear: "2040",
-    // Finanzen / Steuern
-    taxStrategy: "balanced", budgetTop1: "", budgetTop2: "", budgetTop3: "",
+    economy: { services: 45, industry: 25, tech: 20, agri: 10 },
+    // Finanzen
+    taxModel: "balanced",
+    incomeTax: 35, corpTax: 25, vat: 19,
+    debt: 40, // in % vom BIP
   });
   const [prompt, setPrompt] = useState(null);
-  const [url, setUrl] = useState(null);
+  const [imgUrl, setImgUrl] = useState(null);
 
   const set = (key) => (val) => setCity(c => ({ ...c, [key]: val }));
-  const toggleArr = (key) => (id) => setCity(c => ({ ...c, [key]: c[key].includes(id) ? c[key].filter(x => x !== id) : [...c[key], id] }));
+  const setObj = (key) => (val) => setCity(c => ({ ...c, [key]: val }));
   const next = () => setStep(s => s + 1);
   const back = () => setStep(s => s - 1);
 
   const startGeneration = () => {
-    const p = buildCollagePrompt(city);
+    const p = buildCombinedPrompt(city);
     setPrompt(p);
-    setUrl(null);
-    setStep(11);
+    setImgUrl(null);
+    setStep(STEPS.length - 1);
   };
-
-  const genImage = () => {
+  const generateImage = () => {
     if (!prompt) return;
-    setUrl(makeUrl(prompt, 1280, 720));
+    setImgUrl(makeUrl(prompt, 1536, 640)); // breites Triptychon
   };
 
   const reset = () => {
     setStep(0);
     setCity({
       name: "", density: 50, modernity: 50, greenery: 50,
-      archStyle: "", climate: "", daytime: "day", mood: "", visualStyle: "realistic",
+      archStyle: "", climate: "", daytime: "day", mood: "",
       wealth: 50, diversity: 50, ageProfile: 50,
-      popNow: "", popTarget: "", socialHousing: "25",
-      modalTransit: 30, modalBike: 25, modalWalk: 25, modalCar: 20,
-      parkingPolicy: "managed",
-      mainIndustry: "", goals: [],
-      energyOptions: [], energyYear: "2040",
-      taxStrategy: "balanced", budgetTop1: "", budgetTop2: "", budgetTop3: "",
+      mobility: { car: 30, bike: 25, transit: 30, foot: 15 },
+      energy: { renewable: 40, fossil: 35, nuclear: 15, other: 10 },
+      economy: { services: 45, industry: 25, tech: 20, agri: 10 },
+      taxModel: "balanced", incomeTax: 35, corpTax: 25, vat: 19, debt: 40,
     });
-    setPrompt(null); setUrl(null);
+    setPrompt(null); setImgUrl(null);
   };
 
   const summaryRow = (label, value) => (
-    <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f3f4f6", gap: 12 }}>
-      <span style={{ color: "#6b7280", fontSize: 13 }}>{label}</span>
-      <span style={{ fontWeight: 700, fontSize: 13, color: "#1f2937", textAlign: "right" }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f3f4f6" }}>
+      <span style={{ color: "#6b7280", fontSize: 14 }}>{label}</span>
+      <span style={{ fontWeight: 700, fontSize: 14, color: "#1f2937" }}>{value}</span>
     </div>
   );
 
-  const goalsLabel = city.goals.map(id => cityGoals.find(g => g.id === id)?.label).filter(Boolean).join(", ") || "—";
-  const energyLabel = city.energyOptions.map(id => energyOptions.find(g => g.id === id)?.label).filter(Boolean).join(", ") || "—";
-  const taxLabel = taxStrategies.find(t => t.id === city.taxStrategy)?.label || "—";
-  const visualLabel = visualStyles.find(v => v.id === city.visualStyle)?.label || "—";
-  const modalSum = city.modalTransit + city.modalBike + city.modalWalk + city.modalCar;
+  /* --- Daten für Pie-Charts auf der Ergebnisseite --- */
+  const mobilityPie = [
+    { label: "Auto", value: city.mobility.car, color: "#ef4444" },
+    { label: "Fahrrad", value: city.mobility.bike, color: "#10b981" },
+    { label: "ÖPNV", value: city.mobility.transit, color: "#3b82f6" },
+    { label: "Fußgänger", value: city.mobility.foot, color: "#f59e0b" },
+  ];
+  const energyPie = [
+    { label: "Erneuerbar", value: city.energy.renewable, color: "#22c55e" },
+    { label: "Fossil", value: city.energy.fossil, color: "#6b7280" },
+    { label: "Atom", value: city.energy.nuclear, color: "#eab308" },
+    { label: "Sonstiges", value: city.energy.other, color: "#a855f7" },
+  ];
+  const economyPie = [
+    { label: "Dienstleistung", value: city.economy.services, color: "#0ea5e9" },
+    { label: "Industrie", value: city.economy.industry, color: "#f97316" },
+    { label: "Tech / IT", value: city.economy.tech, color: "#8b5cf6" },
+    { label: "Landwirtschaft", value: city.economy.agri, color: "#84cc16" },
+  ];
+  const populationPie = [
+    { label: "Wohlhabend", value: city.wealth, color: "#6366f1" },
+    { label: "Mittelschicht", value: Math.max(0, 100 - city.wealth), color: "#cbd5e1" },
+  ];
+  const taxPie = [
+    { label: "Einkommensteuer", value: city.incomeTax, color: "#6366f1" },
+    { label: "Unternehmenssteuer", value: city.corpTax, color: "#10b981" },
+    { label: "Mehrwertsteuer", value: city.vat, color: "#f59e0b" },
+  ];
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "32px 16px", fontFamily: "system-ui, sans-serif" }}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } * { box-sizing: border-box; }`}</style>
-      <div style={{ width: "100%", maxWidth: 720 }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
+      <div style={{ width: "100%", maxWidth: step === STEPS.length - 1 ? 1200 : 680 }}>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 48, marginBottom: 4 }}>🏙️</div>
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: "#1f2937", letterSpacing: -0.5 }}>CityDesigner</h1>
-          <p style={{ margin: "6px 0 0", color: "#6b7280", fontSize: 14 }}>Stadtplanung für dein Geographie-Projekt</p>
+          <p style={{ margin: "6px 0 0", color: "#6b7280", fontSize: 14 }}>Erschaffe deine Traumstadt – Schritt für Schritt</p>
         </div>
-        <ProgressBar step={step} />
+        <ProgressBar step={step} total={STEPS.length} />
 
-        {/* 0 — Willkommen */}
         {step === 0 && (
           <Card>
-            <SectionTitle icon="✨" title="Willkommen!" sub="Gib deiner Stadt einen Namen." />
+            <SectionTitle icon="✨" title="Willkommen!" sub="Gib deiner Stadt zuerst einen Namen." />
             <input value={city.name} onChange={e => setCity(c => ({ ...c, name: e.target.value }))} placeholder="z.B. Nova Lumina, Eisenhafen, ..."
-              style={{ width: "100%", padding: "16px 18px", borderRadius: 14, border: "2px solid #4f46e5", fontSize: 18, fontWeight: 700, color: "#fff", background: "#1e1b4b", outline: "none", marginBottom: 8 }} />
-            <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>Real oder fiktiv – egal.</p>
+              style={{ width: "100%", padding: "16px 18px", borderRadius: 14, border: "2px solid #4f46e5", fontSize: 18, fontWeight: 700, color: "#ffffff", background: "#1e1b4b", outline: "none", marginBottom: 8 }} />
+            <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>Der Name prägt die gesamte Persönlichkeit deiner Stadt.</p>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 28 }}>
               <button onClick={next} disabled={!city.name.trim()} style={{ padding: "14px 32px", borderRadius: 14, border: "none", background: city.name.trim() ? "#6366f1" : "#d1d5db", color: "#fff", fontWeight: 800, fontSize: 16, cursor: city.name.trim() ? "pointer" : "not-allowed" }}>Loslegen →</button>
             </div>
           </Card>
         )}
 
-        {/* 1 — Charakter */}
         {step === 1 && (
           <Card>
-            <SectionTitle icon="🎚️" title="Stadtcharakter" sub="Wie dicht, wie modern, wie grün?" />
+            <SectionTitle icon="🎚️" title="Stadtcharakter" sub="Wie fühlt sich deine Stadt an?" />
             <SliderField label="Bebauungsdichte" value={city.density} onChange={set("density")} leftLabel="Weitläufig" rightLabel="Megacity" />
             <SliderField label="Modernität" value={city.modernity} onChange={set("modernity")} leftLabel="Historisch" rightLabel="Futuristisch" />
             <SliderField label="Grünanteil" value={city.greenery} onChange={set("greenery")} leftLabel="Betonwüste" rightLabel="Grünoase" />
@@ -353,19 +403,17 @@ export default function CityDesigner() {
           </Card>
         )}
 
-        {/* 2 — Architektur */}
         {step === 2 && (
           <Card>
-            <SectionTitle icon="🏗️" title="Architekturstil" sub="Welcher Stil prägt das Bild?" />
+            <SectionTitle icon="🏗️" title="Architekturstil" sub="Welcher Stil prägt das Erscheinungsbild?" />
             <SingleSelect items={architectureStyles} selected={city.archStyle} onSelect={set("archStyle")} />
             <NavButtons onBack={back} onNext={next} canNext={!!city.archStyle} />
           </Card>
         )}
 
-        {/* 3 — Atmosphäre */}
         {step === 3 && (
           <Card>
-            <SectionTitle icon="🌤️" title="Atmosphäre" sub="Klima, Tageszeit und Stimmung." />
+            <SectionTitle icon="🌤️" title="Atmosphäre" sub="Klima, Tageszeit und Stimmung deiner Stadt." />
             <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", marginBottom: 10 }}>Klima</p>
             <SingleSelect items={climates} selected={city.climate} onSelect={set("climate")} />
             <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "20px 0 10px" }}>Tageszeit</p>
@@ -376,97 +424,68 @@ export default function CityDesigner() {
           </Card>
         )}
 
-        {/* 4 — Bevölkerung */}
         {step === 4 && (
           <Card>
-            <SectionTitle icon="👥" title="Bevölkerung & Soziales" sub="Wer wohnt in deiner Stadt?" />
-            <NumberField label="Einwohner heute" value={city.popNow} onChange={set("popNow")} placeholder="z.B. 80000" />
-            <NumberField label="Einwohner Zieljahr (z.B. 2035)" value={city.popTarget} onChange={set("popTarget")} placeholder="z.B. 110000" />
-            <NumberField label="Anteil Sozialwohnungen" value={city.socialHousing} onChange={set("socialHousing")} placeholder="z.B. 25" suffix="%" />
+            <SectionTitle icon="👥" title="Bevölkerung" sub="Wer wohnt in deiner Stadt?" />
             <SliderField label="Wohlstand" value={city.wealth} onChange={set("wealth")} leftLabel="Arbeiterklasse" rightLabel="Wohlhabend" />
             <SliderField label="Diversität" value={city.diversity} onChange={set("diversity")} leftLabel="Homogen" rightLabel="Kosmopolit" />
-            <SliderField label="Altersstruktur" value={city.ageProfile} onChange={set("ageProfile")} leftLabel="Jung" rightLabel="Älter" />
+            <SliderField label="Altersstruktur" value={city.ageProfile} onChange={set("ageProfile")} leftLabel="Jung & dynamisch" rightLabel="Erfahren & reif" />
             <NavButtons onBack={back} onNext={next} />
           </Card>
         )}
 
-        {/* 5 — Verkehr */}
         {step === 5 && (
           <Card>
-            <SectionTitle icon="🚦" title="Verkehr & Mobilität" sub="Modal Split: Wie verteilen sich die Wege? (Summe ≈ 100 %)" />
-            <SliderField label={`ÖPNV (Bus/Tram)`} value={city.modalTransit} onChange={set("modalTransit")} leftLabel="0%" rightLabel="100%" />
-            <SliderField label="Rad" value={city.modalBike} onChange={set("modalBike")} leftLabel="0%" rightLabel="100%" />
-            <SliderField label="Fußgänger" value={city.modalWalk} onChange={set("modalWalk")} leftLabel="0%" rightLabel="100%" />
-            <SliderField label="Auto" value={city.modalCar} onChange={set("modalCar")} leftLabel="0%" rightLabel="100%" />
-            <p style={{ fontSize: 12, color: modalSum === 100 ? "#10b981" : "#f59e0b", marginTop: -10, marginBottom: 18, fontWeight: 700 }}>
-              Summe: {modalSum}% {modalSum === 100 ? "✓" : "(empfohlen: 100%)"}
-            </p>
-            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "8px 0 10px" }}>Parkraumpolitik</p>
-            <SingleSelect items={[
-              { id: "free", label: "Viele freie Plätze", emoji: "🅿️" },
-              { id: "managed", label: "Parkmanagement", emoji: "🚙", desc: "Parkhäuser am Rand" },
-              { id: "restrictive", label: "Auto-arm", emoji: "🚫", desc: "City-Maut, kaum Parken" },
-            ]} selected={city.parkingPolicy} onSelect={set("parkingPolicy")} />
+            <SectionTitle icon="🚲" title="Mobilität" sub="Wie bewegen sich die Menschen fort?" />
+            <MixSliders title="Verkehrsmittel-Mix" values={city.mobility} setValues={setObj("mobility")} fields={[
+              { key: "car", label: "Auto", emoji: "🚗", color: "#ef4444" },
+              { key: "bike", label: "Fahrrad", emoji: "🚲", color: "#10b981" },
+              { key: "transit", label: "ÖPNV", emoji: "🚇", color: "#3b82f6" },
+              { key: "foot", label: "Fußgänger", emoji: "🚶", color: "#f59e0b" },
+            ]} />
             <NavButtons onBack={back} onNext={next} />
           </Card>
         )}
 
-        {/* 6 — Wirtschaft & Ziele */}
         {step === 6 && (
           <Card>
-            <SectionTitle icon="🏭" title="Wirtschaft & Ziele" sub="Was ist die Priorität deiner Stadt?" />
-            <NumberField label="Hauptbranche / Wirtschaftszweig" value={city.mainIndustry} onChange={set("mainIndustry")} placeholder="z.B. IT, Tourismus, Hafen" />
-            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "12px 0 10px" }}>Top-Ziele (max. 3 wählen)</p>
-            <MultiSelect items={cityGoals} selected={city.goals} onToggle={(id) => {
-              if (city.goals.includes(id)) toggleArr("goals")(id);
-              else if (city.goals.length < 3) toggleArr("goals")(id);
-            }} />
-            <NavButtons onBack={back} onNext={next} canNext={city.goals.length > 0} />
+            <SectionTitle icon="⚡" title="Wirtschaft & Energie" sub="Womit verdient deine Stadt ihr Geld – und woher kommt der Strom?" />
+            <MixSliders title="Energiemix" values={city.energy} setValues={setObj("energy")} fields={[
+              { key: "renewable", label: "Erneuerbar", emoji: "🌬️", color: "#22c55e" },
+              { key: "fossil", label: "Fossil", emoji: "🛢️", color: "#6b7280" },
+              { key: "nuclear", label: "Atomkraft", emoji: "☢️", color: "#eab308" },
+              { key: "other", label: "Sonstiges", emoji: "🔋", color: "#a855f7" },
+            ]} />
+            <div style={{ height: 1, background: "#f3f4f6", margin: "12px 0 18px" }} />
+            <MixSliders title="Wirtschaftssektoren" values={city.economy} setValues={setObj("economy")} fields={[
+              { key: "services", label: "Dienstleistung", emoji: "💼", color: "#0ea5e9" },
+              { key: "industry", label: "Industrie", emoji: "🏭", color: "#f97316" },
+              { key: "tech", label: "Tech / IT", emoji: "💻", color: "#8b5cf6" },
+              { key: "agri", label: "Landwirtschaft", emoji: "🌾", color: "#84cc16" },
+            ]} />
+            <NavButtons onBack={back} onNext={next} />
           </Card>
         )}
 
-        {/* 7 — Energie & Klima */}
         {step === 7 && (
           <Card>
-            <SectionTitle icon="🌱" title="Energie & Klima" sub="Welche Maßnahmen sollen umgesetzt werden?" />
-            <NumberField label="Klimaneutral bis Jahr" value={city.energyYear} onChange={set("energyYear")} placeholder="z.B. 2040" />
-            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "12px 0 10px" }}>Maßnahmen (mehrere möglich)</p>
-            <MultiSelect items={energyOptions} selected={city.energyOptions} onToggle={toggleArr("energyOptions")} />
-            <NavButtons onBack={back} onNext={next} />
+            <SectionTitle icon="💰" title="Steuern & Finanzen" sub="Wie finanziert sich deine Stadt?" />
+            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", marginBottom: 10 }}>Steuermodell</p>
+            <SingleSelect items={taxModels} selected={city.taxModel} onSelect={set("taxModel")} />
+            <div style={{ height: 18 }} />
+            <SliderField label="Einkommensteuer (Spitzensatz)" value={city.incomeTax} onChange={set("incomeTax")} leftLabel="0 %" rightLabel="100 %" />
+            <SliderField label="Unternehmenssteuer" value={city.corpTax} onChange={set("corpTax")} leftLabel="0 %" rightLabel="100 %" />
+            <SliderField label="Mehrwertsteuer" value={city.vat} onChange={set("vat")} leftLabel="0 %" rightLabel="100 %" />
+            <SliderField label="Staatsverschuldung (% BIP)" value={city.debt} onChange={set("debt")} leftLabel="Schuldenfrei" rightLabel="Hochverschuldet" />
+            <NavButtons onBack={back} onNext={next} canNext={!!city.taxModel} />
           </Card>
         )}
 
-        {/* 8 — Finanzen / Steuern */}
         {step === 8 && (
           <Card>
-            <SectionTitle icon="💰" title="Steuerstrategie & Budget" sub="Wie finanziert sich deine Stadt?" />
-            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", marginBottom: 10 }}>Steuerstrategie</p>
-            <SingleSelect items={taxStrategies} selected={city.taxStrategy} onSelect={set("taxStrategy")} />
-            <p style={{ fontWeight: 700, fontSize: 14, color: "#374151", margin: "20px 0 10px" }}>Budget-Prioritäten (Top 3)</p>
-            <NumberField label="Priorität 1" value={city.budgetTop1} onChange={set("budgetTop1")} placeholder="z.B. ÖPNV-Ausbau" />
-            <NumberField label="Priorität 2" value={city.budgetTop2} onChange={set("budgetTop2")} placeholder="z.B. Schulen" />
-            <NumberField label="Priorität 3" value={city.budgetTop3} onChange={set("budgetTop3")} placeholder="z.B. Klimaschutz" />
-            <NavButtons onBack={back} onNext={next} />
-          </Card>
-        )}
-
-        {/* 9 — Visualisierungsstil */}
-        {step === 9 && (
-          <Card>
-            <SectionTitle icon="🎨" title="Bildstil" sub="Wie soll die Collage aussehen?" />
-            <SingleSelect items={visualStyles} selected={city.visualStyle} onSelect={set("visualStyle")} />
-            <NavButtons onBack={back} onNext={next} />
-          </Card>
-        )}
-
-        {/* 10 — Zusammenfassung */}
-        {step === 10 && (
-          <Card>
-            <SectionTitle icon="📋" title={`"${city.name}" – Zusammenfassung`} sub="Alle Eckdaten auf einen Blick." />
+            <SectionTitle icon="📋" title={`"${city.name}" – Zusammenfassung`} sub="Überprüfe alles und starte dann die Generierung." />
             <div style={{ background: "#f9fafb", borderRadius: 14, padding: 20, marginBottom: 8 }}>
               {summaryRow("Stadtname", city.name)}
-              {summaryRow("Einwohner heute → Ziel", `${city.popNow || "?"} → ${city.popTarget || "?"}`)}
-              {summaryRow("Sozialwohnungen", `${city.socialHousing}%`)}
               {summaryRow("Bebauungsdichte", `${city.density}%`)}
               {summaryRow("Modernität", `${city.modernity}%`)}
               {summaryRow("Grünanteil", `${city.greenery}%`)}
@@ -474,51 +493,54 @@ export default function CityDesigner() {
               {summaryRow("Klima", climates.find(s => s.id === city.climate)?.label || "—")}
               {summaryRow("Tageszeit", daytimes.find(s => s.id === city.daytime)?.label || "—")}
               {summaryRow("Stimmung", moods.find(s => s.id === city.mood)?.label || "—")}
-              {summaryRow("Modal Split (ÖPNV/Rad/Fuß/Auto)", `${city.modalTransit}/${city.modalBike}/${city.modalWalk}/${city.modalCar}%`)}
-              {summaryRow("Parkraumpolitik", city.parkingPolicy)}
-              {summaryRow("Hauptbranche", city.mainIndustry || "—")}
-              {summaryRow("Top-Ziele", goalsLabel)}
-              {summaryRow("Klimaneutral bis", city.energyYear)}
-              {summaryRow("Energie-Maßnahmen", energyLabel)}
-              {summaryRow("Steuerstrategie", taxLabel)}
-              {summaryRow("Budget Top-3", [city.budgetTop1, city.budgetTop2, city.budgetTop3].filter(Boolean).join(", ") || "—")}
-              {summaryRow("Bildstil", visualLabel)}
+              {summaryRow("Wohlstand", `${city.wealth}%`)}
+              {summaryRow("Diversität", `${city.diversity}%`)}
+              {summaryRow("Altersstruktur", `${city.ageProfile}%`)}
+              {summaryRow("Steuermodell", taxModels.find(s => s.id === city.taxModel)?.label || "—")}
+              {summaryRow("Einkommensteuer", `${city.incomeTax}%`)}
+              {summaryRow("Unternehmenssteuer", `${city.corpTax}%`)}
+              {summaryRow("Mehrwertsteuer", `${city.vat}%`)}
+              {summaryRow("Staatsverschuldung", `${city.debt}% BIP`)}
             </div>
-            <NavButtons onBack={back} onNext={startGeneration} nextLabel="🖼️ Collage erstellen →" />
+            <NavButtons onBack={back} onNext={startGeneration} nextLabel="🏙️ Stadt erstellen →" />
           </Card>
         )}
 
-        {/* 11 — Ergebnis: 1 Collage + Eckdaten */}
-        {step === 11 && prompt && (
+        {step === STEPS.length - 1 && prompt && (
           <div>
             <div style={{ textAlign: "center", marginBottom: 24 }}>
               <div style={{ fontSize: 40, marginBottom: 6 }}>🎉</div>
-              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#1f2937" }}>{city.name} – Stadtplanungs-Collage</h2>
-              <p style={{ color: "#6b7280", fontSize: 13, margin: "6px 0 0" }}>3 Perspektiven in 1 Bild – nur 1 Generierung, geringere Serverlast.</p>
+              <h2 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: "#1f2937" }}>{city.name}</h2>
+              <p style={{ color: "#6b7280", fontSize: 13, margin: "6px 0 0" }}>Ein einziges KI-Bild zeigt Innenstadt, typischen Bewohner und Vogelperspektive.</p>
             </div>
 
-            <CollageCard prompt={prompt} url={url} onGenerate={genImage} />
+            <BigImageCard prompt={prompt} url={imgUrl} onGenerate={generateImage} />
 
-            {/* Eckdaten als Textblock */}
-            <Card>
-              <SectionTitle icon="📊" title="Eckdaten der Stadt" sub="Wichtige Kennzahlen für die Planung" />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
-                <FactBox label="👥 Einwohner" value={`${city.popNow || "?"} → ${city.popTarget || "?"}`} />
-                <FactBox label="🏠 Sozialwohnungen" value={`${city.socialHousing}%`} />
-                <FactBox label="🌳 Grünanteil" value={`${city.greenery}%`} />
-                <FactBox label="🏗️ Dichte" value={`${city.density}%`} />
-                <FactBox label="🚊 Modal Split" value={`ÖPNV ${city.modalTransit}% · Rad ${city.modalBike}% · Fuß ${city.modalWalk}% · Auto ${city.modalCar}%`} />
-                <FactBox label="🅿️ Parken" value={city.parkingPolicy} />
-                <FactBox label="🏭 Wirtschaft" value={city.mainIndustry || "—"} />
-                <FactBox label="🎯 Ziele" value={goalsLabel} />
-                <FactBox label="🌱 Klimaneutral" value={city.energyYear} />
-                <FactBox label="⚡ Energie" value={energyLabel} />
-                <FactBox label="💰 Steuern" value={taxLabel} />
-                <FactBox label="📊 Budget Top-3" value={[city.budgetTop1, city.budgetTop2, city.budgetTop3].filter(Boolean).join(", ") || "—"} />
+            {/* ECKDATEN-INFOKASTEN */}
+            <div style={{ background: "#fff", borderRadius: 20, padding: 24, marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+              <h3 style={{ margin: "0 0 16px", fontSize: 18, fontWeight: 800, color: "#1f2937" }}>📊 Eckdaten von {city.name}</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 }}>
+                <Stat label="Architektur" value={architectureStyles.find(s => s.id === city.archStyle)?.label || "—"} emoji="🏗️" />
+                <Stat label="Klima" value={climates.find(s => s.id === city.climate)?.label || "—"} emoji="🌤️" />
+                <Stat label="Stimmung" value={moods.find(s => s.id === city.mood)?.label || "—"} emoji="✨" />
+                <Stat label="Bebauungsdichte" value={`${city.density}%`} emoji="🏢" />
+                <Stat label="Grünanteil" value={`${city.greenery}%`} emoji="🌳" />
+                <Stat label="Modernität" value={`${city.modernity}%`} emoji="🚀" />
+                <Stat label="Steuermodell" value={taxModels.find(s => s.id === city.taxModel)?.label || "—"} emoji="💰" />
+                <Stat label="Staatsverschuldung" value={`${city.debt}% BIP`} emoji="📉" />
               </div>
-            </Card>
+            </div>
 
-            <button onClick={reset} style={{ width: "100%", marginTop: 20, padding: "14px", borderRadius: 14, border: "2px solid #e5e7eb", background: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14, color: "#374151" }}>🔄 Neue Stadt entwerfen</button>
+            {/* PIE-CHARTS */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 18, marginBottom: 24 }}>
+              <PieChart title="🚲 Mobilitätsmix" data={mobilityPie} />
+              <PieChart title="⚡ Energiemix" data={energyPie} />
+              <PieChart title="💼 Wirtschaftssektoren" data={economyPie} />
+              <PieChart title="💰 Steuern (Sätze)" data={taxPie} />
+              <PieChart title="👥 Wohlstandsverteilung" data={populationPie} />
+            </div>
+
+            <button onClick={reset} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "2px solid #e5e7eb", background: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14, color: "#374151" }}>🔄 Neue Stadt entwerfen</button>
           </div>
         )}
       </div>
@@ -526,9 +548,14 @@ export default function CityDesigner() {
   );
 }
 
-const FactBox = ({ label, value }) => (
-  <div style={{ background: "#f9fafb", borderRadius: 12, padding: "12px 14px", border: "1px solid #e5e7eb" }}>
-    <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</div>
-    <div style={{ fontSize: 14, color: "#1f2937", fontWeight: 700, lineHeight: 1.4 }}>{value}</div>
-  </div>
-);
+/* ============================================================
+   KLEINE STAT-KACHEL für den Eckdaten-Infokasten
+   ============================================================ */
+function Stat({ label, value, emoji }) {
+  return (
+    <div style={{ background: "#f9fafb", borderRadius: 12, padding: "12px 14px" }}>
+      <div style={{ fontSize: 11, color: "#6b7280", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>{emoji} {label}</div>
+      <div style={{ fontSize: 15, fontWeight: 800, color: "#1f2937" }}>{value}</div>
+    </div>
+  );
+}
